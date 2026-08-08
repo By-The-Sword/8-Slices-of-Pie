@@ -83,7 +83,7 @@ public class EnemyMov : MonoBehaviour
     [SerializeField] private int retreatSamples = 11;
 
     [Header("Lampião")]
-    [Tooltip("Foge do círculo de luz acesa. O gerenciador de fatias desliga isto na 7ª, quando " +
+    [Tooltip("Foge do círculo de luz acesa. O EnemyHabilities desliga isto na 7ª fatia, quando " +
              "a luz deixa de assustá-lo e passa a atraí-lo (GDD).")]
     [SerializeField] private bool fearsLight = true;
 
@@ -114,6 +114,27 @@ public class EnemyMov : MonoBehaviour
     {
         get => fearsLight;
         set => fearsLight = value;
+    }
+
+    /// <summary>Sente a presença dela sem enxergar. O <see cref="EnemyHabilities"/> abre isto na 4ª.</summary>
+    public float SenseRadius
+    {
+        get => senseRadius;
+        set => senseRadius = Mathf.Max(0f, value);
+    }
+
+    /// <summary>Alcance da visão. Aberto pelo <see cref="EnemyHabilities"/> conforme a noite avança.</summary>
+    public float SightRadius
+    {
+        get => sightRadius;
+        set => sightRadius = Mathf.Max(0f, value);
+    }
+
+    /// <summary>Velocidade de perseguição — o que deixa ele "mais rápido" a cada hora (GDD).</summary>
+    public float ChaseSpeed
+    {
+        get => chaseSpeed;
+        set => chaseSpeed = Mathf.Max(0f, value);
     }
 
     /// <summary>

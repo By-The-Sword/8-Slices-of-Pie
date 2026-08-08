@@ -20,7 +20,7 @@ public class EnemyAtk : MonoBehaviour
              "EnemyMov; isto é a segunda trava, caso algo tire ele do Recuo antes da hora.")]
     [SerializeField] private float cooldown = 3f;
 
-    /// <summary>Corações da mordida — o gerenciador de fatias sobe isso pra 2 na 5ª.</summary>
+    /// <summary>Corações da mordida — o <see cref="EnemyHabilities"/> sobe isso pra 2 na 5ª.</summary>
     public int Damage
     {
         get => damage;
