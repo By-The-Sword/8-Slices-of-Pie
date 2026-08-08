@@ -14,6 +14,8 @@ public enum WolfState
 /// Chapéuzinho — por proximidade ou por ruído — e aí entra em SUSPEITA e vai até o
 /// último lugar onde ela esteve. Com linha de visão limpa vira PERSEGUIÇÃO.
 /// Agachada ela não é percebida (GDD): nem pela proximidade, nem pela visão.
+/// Entrar no círculo do lampião aceso interrompe qualquer estado e joga ele em RECUO,
+/// onde ele não morde — é a fraqueza dele, válida até a 7ª fatia (ver <see cref="FearsLight"/>).
 /// Nunca é derrotável e não tem combate aqui — quem morde é o EnemyAtk, que chama
 /// <see cref="Retreat"/> pra ele disparar pro ponto livre mais longe dela.
 /// </summary>
@@ -80,6 +82,11 @@ public class EnemyMov : MonoBehaviour
     [Range(3, 21)]
     [SerializeField] private int retreatSamples = 11;
 
+    [Header("Lampião")]
+    [Tooltip("Foge do círculo de luz acesa. O gerenciador de fatias desliga isto na 7ª, quando " +
+             "a luz deixa de assustá-lo e passa a atraí-lo (GDD).")]
+    [SerializeField] private bool fearsLight = true;
+
     [Header("Corpo")]
     [Tooltip("Raio usado pra desviar de parede e pra validar destino de patrulha.")]
     [SerializeField] private float bodyRadius = 0.4f;
@@ -102,10 +109,26 @@ public class EnemyMov : MonoBehaviour
     /// <summary>Trava a IA sem desligar o componente (cutscene, 8ª fatia, menu).</summary>
     public bool MovementLocked { get; set; }
 
+    /// <summary>Teme a luz. Vira false na 7ª fatia, quando o lampião passa a atraí-lo (GDD).</summary>
+    public bool FearsLight
+    {
+        get => fearsLight;
+        set => fearsLight = value;
+    }
+
+    /// <summary>
+    /// Está dentro do círculo do lampião aceso: não morde e foge. Calculado na hora, e não
+    /// guardado num campo, pra valer no mesmo frame em que ela aperta F — senão a ordem de
+    /// Update entre este script e o EnemyAtk decidiria se a mordida ainda sai.
+    /// </summary>
+    public bool IsRepelledByLight =>
+        fearsLight && lantern != null && lantern.Illuminates(transform.position);
+
     public event System.Action<WolfState> OnStateChanged;
 
     private Rigidbody2D body;
     private PlayerController playerController;
+    private Lantern lantern;
     private Vector2 patrolAnchor;
     private Vector2 destination;
     private float stateTimer;
@@ -142,7 +165,10 @@ public class EnemyMov : MonoBehaviour
         }
 
         if (player != null)
+        {
             playerController = player.GetComponent<PlayerController>();
+            lantern = player.GetComponent<Lantern>();
+        }
 
         PickPatrolDestination();
     }
@@ -156,6 +182,14 @@ public class EnemyMov : MonoBehaviour
             return;
 
         stateTimer -= Time.deltaTime;
+
+        // A luz vem antes de tudo: pegou ele dentro do círculo, larga o que estava fazendo
+        // — inclusive a perseguição, a um passo da mordida — e sai correndo.
+        if (IsRepelledByLight && State != WolfState.Recuo)
+        {
+            Retreat(lantern.LightCenter);
+            return;
+        }
 
         switch (State)
         {
@@ -285,6 +319,15 @@ public class EnemyMov : MonoBehaviour
         if (!ReachedDestination() && repathTimer > 0f)
             return;
 
+        // Ainda dentro da luz: reorienta a partir de onde ela está agora e segue fugindo,
+        // sem prazo. Enquanto o lampião estiver aceso em cima dele, não existe volta à ronda.
+        if (IsRepelledByLight)
+        {
+            retreatThreat = lantern.LightCenter;
+            ExtendRetreat();
+            return;
+        }
+
         // Chegou (ou empacou) antes da hora: escolhe outro ponto e continua fugindo.
         if (stateTimer > 0f)
         {
@@ -313,7 +356,8 @@ public class EnemyMov : MonoBehaviour
 
     /// <summary>
     /// Dispara pro ponto livre mais longe da ameaça, no sentido contrário a ela.
-    /// Quem chama é o EnemyAtk, logo depois da mordida conectar.
+    /// Dois gatilhos: o EnemyAtk logo depois da mordida conectar, e o círculo do lampião
+    /// aceso — este último segura ele em fuga enquanto a luz continuar em cima dele.
     /// </summary>
     public void Retreat(Vector2 threatPosition)
     {

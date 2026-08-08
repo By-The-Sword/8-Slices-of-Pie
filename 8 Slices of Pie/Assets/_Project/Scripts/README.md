@@ -53,7 +53,9 @@ public class BatteryPickup : MonoBehaviour, IInteractable
 
 ## IA do Lobo
 
-- `Lantern.IsOn` — recua com a luz acesa **até a 7ª fatia**; depois a luz atrai.
+- `Lantern.Illuminates(ponto)` — já ligado: dentro do círculo aceso ele entra em RECUO e
+  não morde. Na 7ª fatia, `enemyMov.FearsLight = false` desliga a regra (a luz atrair
+  ainda não existe). O raio que vale é o **Outer Radius** do Light2D.
 - `PlayerController.IsCrouched` — agachada ele não a percebe.
 - `Noise.OnNoise` — assinar para o estado SUSPEITA (com `-=` no `OnDisable`).
 - `playerHealth.TakeDamage(1, transform.position)` — 2 a partir da 5ª fatia.
