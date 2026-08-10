@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4006732975881384413}
   - component: {fileID: 4128937931364372039}
   - component: {fileID: 5428012877189804637}
+  - component: {fileID: -997021173583838569}
   m_Layer: 0
   m_Name: Wolf
   m_TagString: Untagged
@@ -146,6 +147,7 @@ MonoBehaviour:
   keepRetreatInPatrolArea: 1
   retreatConeAngle: 160
   retreatSamples: 11
+  fearsLight: 1
   bodyRadius: 0.4626
   avoidLookAhead: 1.2
   arrivalDistance: 0.35
@@ -164,3 +166,138 @@ MonoBehaviour:
   damage: 1
   range: 0.9
   cooldown: 1
+--- !u!114 &-997021173583838569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7467585422729443407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 981f3207d506ceb48ba19fd223cf5675, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clock: {fileID: 0}
+  spawnPoint: {fileID: 0}
+  audioSource: {fileID: 0}
+  lightLureInterval: 0.5
+  lightLureRadius: 25
+  stages:
+  - label: "22:00 \xB7 0 fatias \u2014 uivo distante, sem perigo"
+    present: 0
+    senseRadius: 6
+    sightRadius: 10
+    chaseSpeed: 4
+    biteDamage: 1
+    fearsLight: 1
+    attractedByLight: 0
+    tracksBlood: 0
+    cue: {fileID: 0}
+    onReached:
+      m_PersistentCalls:
+        m_Calls: []
+  - label: "23:00 \xB7 Uivo distante aud\xEDvel"
+    present: 0
+    senseRadius: 6
+    sightRadius: 10
+    chaseSpeed: 4
+    biteDamage: 1
+    fearsLight: 1
+    attractedByLight: 0
+    tracksBlood: 0
+    cue: {fileID: 0}
+    onReached:
+      m_PersistentCalls:
+        m_Calls: []
+  - label: "00:00 \xB7 Postes da cidade piscam"
+    present: 0
+    senseRadius: 6
+    sightRadius: 10
+    chaseSpeed: 4
+    biteDamage: 1
+    fearsLight: 1
+    attractedByLight: 0
+    tracksBlood: 0
+    cue: {fileID: 0}
+    onReached:
+      m_PersistentCalls:
+        m_Calls: []
+  - label: "01:00 \xB7 Luzes se apagam \xB7 o Lobo entra no mapa"
+    present: 1
+    senseRadius: 6
+    sightRadius: 10
+    chaseSpeed: 4
+    biteDamage: 1
+    fearsLight: 1
+    attractedByLight: 0
+    tracksBlood: 0
+    cue: {fileID: 0}
+    onReached:
+      m_PersistentCalls:
+        m_Calls: []
+  - label: "02:00 \xB7 Sente o cheiro do sangue dela"
+    present: 1
+    senseRadius: 12
+    sightRadius: 10
+    chaseSpeed: 4
+    biteDamage: 1
+    fearsLight: 1
+    attractedByLight: 0
+    tracksBlood: 1
+    cue: {fileID: 0}
+    onReached:
+      m_PersistentCalls:
+        m_Calls: []
+  - label: "03:00 \xB7 Cria garras"
+    present: 1
+    senseRadius: 12
+    sightRadius: 10
+    chaseSpeed: 4
+    biteDamage: 2
+    fearsLight: 1
+    attractedByLight: 0
+    tracksBlood: 1
+    cue: {fileID: 0}
+    onReached:
+      m_PersistentCalls:
+        m_Calls: []
+  - label: "04:00 \xB7 A cidade amanhece coberta de sangue"
+    present: 1
+    senseRadius: 12
+    sightRadius: 10
+    chaseSpeed: 4
+    biteDamage: 2
+    fearsLight: 1
+    attractedByLight: 0
+    tracksBlood: 1
+    cue: {fileID: 0}
+    onReached:
+      m_PersistentCalls:
+        m_Calls: []
+  - label: "05:00 \xB7 Deixa de temer a luz \u2014 ela passa a atra\xED-lo"
+    present: 1
+    senseRadius: 12
+    sightRadius: 10
+    chaseSpeed: 4
+    biteDamage: 2
+    fearsLight: 0
+    attractedByLight: 1
+    tracksBlood: 1
+    cue: {fileID: 0}
+    onReached:
+      m_PersistentCalls:
+        m_Calls: []
+  - label: "06:00 \xB7 Desaparece do mapa"
+    present: 0
+    senseRadius: 12
+    sightRadius: 10
+    chaseSpeed: 4
+    biteDamage: 2
+    fearsLight: 0
+    attractedByLight: 1
+    tracksBlood: 1
+    cue: {fileID: 0}
+    onReached:
+      m_PersistentCalls:
+        m_Calls: []
