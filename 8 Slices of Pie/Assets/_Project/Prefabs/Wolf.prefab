@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 4128937931364372039}
   - component: {fileID: 5428012877189804637}
   - component: {fileID: -997021173583838569}
+  - component: {fileID: -3530153089835368317}
+  - component: {fileID: -997654893857413106}
   m_Layer: 0
   m_Name: Wolf
   m_TagString: Untagged
@@ -209,7 +211,19 @@ MonoBehaviour:
     cue: {fileID: 0}
     onReached:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: -3530153089835368317}
+          m_TargetAssemblyTypeName: EnemyAudio, Assembly-CSharp
+          m_MethodName: PlayHowl
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
   - label: "00:00 \xB7 Postes da cidade piscam"
     present: 0
     senseRadius: 6
@@ -301,3 +315,158 @@ MonoBehaviour:
     onReached:
       m_PersistentCalls:
         m_Calls: []
+--- !u!114 &-3530153089835368317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7467585422729443407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9200240b2e8fc445b8083c74f4b881b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  breathSource: {fileID: 0}
+  stepSource: {fileID: 0}
+  voiceSource: {fileID: -997654893857413106}
+  breathLoop: {fileID: 0}
+  stepClips: []
+  growlClips:
+  - {fileID: 8300000, guid: 0adb8118bb007884a98702e4bfeaa5b9, type: 3}
+  attackClips: []
+  howlClips:
+  - {fileID: 8300000, guid: b60d2395619e6d047ac00df776ce242c, type: 3}
+  lamentClips: []
+  nearDistance: 2
+  farDistance: 18
+  falloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  breathVolume: 0.6
+  stepVolume: 1
+  minVoiceVolume: 0.35
+  panStrength: 0.7
+  panDistance: 8
+  stepDistance: 0.9
+  chaseVolumeBoost: 1.3
+  chaseBreathPitch: 1.2
+  chaseGrowlInterval: {x: 3, y: 6}
+  patrolHowlInterval: {x: 25, y: 60}
+--- !u!82 &-997654893857413106
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7467585422729443407}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
