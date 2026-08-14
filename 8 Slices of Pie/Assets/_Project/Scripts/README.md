@@ -51,9 +51,36 @@ public class BatteryPickup : MonoBehaviour, IInteractable
 
 `Noise.Emit(pos, raio, source)` faz barulho que o Lobo escuta.
 
+## Relógio da noite
+
+`Clock` vai num objeto de cena (não no Player) e lê o `PlayerInventory` sozinho.
+Começa em `22:00` e avança 1h por fatia — `23:00`, `00:00`, `01:00`... até `06:00`
+na oitava. Quem precisa reagir a uma hora escuta `OnHourChanged(hora, texto)` em vez de
+contar fatia. `clock.TimeText` já vem formatado pra HUD; `clock.HoursElapsed` é o
+progresso (0–8). Quem já escuta ele: a HUD e o `EnemyHabilities`.
+
+## Evolução do Lobo
+
+`EnemyHabilities` (no Wolf.prefab, junto do EnemyMov) é a tabela da seção 05 do GDD em
+forma de componente: um `WolfStage` por fatia, índice 0–8. A cada hora ele reescreve o
+Lobo inteiro — presença no mapa, `SenseRadius`, `SightRadius`, `ChaseSpeed`,
+`EnemyAtk.Damage` e `FearsLight`. Aplicar um estágio é idempotente: recomeçar a noite é
+só chamar `ApplyStage(0)`.
+
+O que **não** é do Lobo — postes piscando (2ª), luzes da cidade apagando (3ª), sangue nas
+ruas (6ª) — sai pelo `UnityEvent onReached` de cada estágio: ligue o objeto de cena no
+Inspector, sem código. O `cue` toca o som da hora (o uivo distante da 1ª).
+
+Dois campos de cena valem configurar: `spawnPoint`, por onde ele entra na 3ª fatia, e o
+`audioSource`. Fora do mapa (antes da 3ª e depois da 8ª) ele não é destruído — a IA trava
+e renderers e colliders desligam, pra ele poder voltar.
+
 ## IA do Lobo
 
-- `Lantern.IsOn` — recua com a luz acesa **até a 7ª fatia**; depois a luz atrai.
+- `Lantern.Illuminates(ponto)` — já ligado: dentro do círculo aceso ele entra em RECUO e
+  não morde. Na 7ª fatia o `EnemyHabilities` desliga a regra e passa a emitir ruído na
+  posição da luz acesa, que é como ela vira isca. O raio que vale é o **Outer Radius**
+  do Light2D.
 - `PlayerController.IsCrouched` — agachada ele não a percebe.
 - `Noise.OnNoise` — assinar para o estado SUSPEITA (com `-=` no `OnDisable`).
 - `playerHealth.TakeDamage(1, transform.position)` — 2 a partir da 5ª fatia.

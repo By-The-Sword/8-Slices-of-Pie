@@ -13,6 +13,10 @@ public class Lantern : MonoBehaviour
     [Tooltip("Light2D do círculo de luz. Pode ficar vazio enquanto a arte não existe.")]
     [SerializeField] private Light2D lampLight;
 
+    [Tooltip("Raio usado enquanto não houver Light2D. Com o Light2D no lugar quem manda é o " +
+             "Outer Radius dele, pra área que afasta o Lobo ser exatamente a que se vê.")]
+    [SerializeField] private float fallbackLightRadius = 5f;
+
     [Header("Bateria")]
     [SerializeField] private int barsPerBattery = 4;
     [SerializeField] private float secondsPerBar = 15f;
@@ -35,6 +39,23 @@ public class Lantern : MonoBehaviour
     public bool IsOn { get; private set; }
     public int SpareBatteries => spareBatteries;
     public bool HasCharge => chargeSeconds > 0f;
+
+    /// <summary>Centro do círculo de luz: o Light2D, que costuma ser um filho deslocado dela.</summary>
+    public Vector2 LightCenter => lampLight != null ? (Vector2)lampLight.transform.position
+                                                   : (Vector2)transform.position;
+
+    /// <summary>Raio do círculo de luz, lido do Outer Radius do Light2D.</summary>
+    public float LightRadius => lampLight != null ? lampLight.pointLightOuterRadius
+                                                  : fallbackLightRadius;
+
+    /// <summary>
+    /// Se este ponto está dentro da luz acesa. É por aqui que o Lobo sabe que precisa recuar —
+    /// a regra do círculo mora aqui, e não na IA dele.
+    /// </summary>
+    public bool Illuminates(Vector2 point)
+    {
+        return IsOn && Vector2.Distance(point, LightCenter) <= LightRadius;
+    }
 
     /// <summary>Duração total de uma bateria cheia, em segundos (4 × 15 = 60).</summary>
     public float FullChargeSeconds => barsPerBattery * secondsPerBar;

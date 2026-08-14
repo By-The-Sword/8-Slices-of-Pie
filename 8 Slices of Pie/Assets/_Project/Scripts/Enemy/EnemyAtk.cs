@@ -4,6 +4,7 @@ using UnityEngine;
 /// A mordida do Lobo Mau. Ele não tem combate de verdade: encosta na Chapéuzinho,
 /// tira coração e sai correndo — quem corre é o <see cref="EnemyMov"/>, chamado aqui.
 /// Só morde perseguindo: farejando ou patrulhando ele ainda não a identificou (GDD).
+/// Dentro do círculo do lampião aceso não morde de jeito nenhum — a luz é o escudo dela.
 /// </summary>
 [RequireComponent(typeof(EnemyMov))]
 public class EnemyAtk : MonoBehaviour
@@ -19,7 +20,7 @@ public class EnemyAtk : MonoBehaviour
              "EnemyMov; isto é a segunda trava, caso algo tire ele do Recuo antes da hora.")]
     [SerializeField] private float cooldown = 3f;
 
-    /// <summary>Corações da mordida — o gerenciador de fatias sobe isso pra 2 na 5ª.</summary>
+    /// <summary>Corações da mordida — o <see cref="EnemyHabilities"/> sobe isso pra 2 na 5ª.</summary>
     public int Damage
     {
         get => damage;
@@ -46,6 +47,11 @@ public class EnemyAtk : MonoBehaviour
             return;
 
         if (movement.MovementLocked || movement.State != WolfState.Perseguicao)
+            return;
+
+        // Redundante com o RECUO que a luz dispara no EnemyMov, de propósito: a ordem de Update
+        // entre os dois não é garantida, e sem isto a mordida ainda sai no frame do F.
+        if (movement.IsRepelledByLight)
             return;
 
         if (Time.time < nextBiteTime || playerHealth.IsDead)
