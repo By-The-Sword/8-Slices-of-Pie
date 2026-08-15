@@ -37,11 +37,15 @@ public class NightRunner : MonoBehaviour
     [SerializeField] private bool freezeWolfOnDeath = true;
 
     [Header("Fade")]
-    [Tooltip("CanvasGroup de uma imagem preta cobrindo a tela, começando com alpha 0. " +
-             "Pode ficar vazio: aí a cena recarrega seca, sem escurecer.")]
+    [Tooltip("CanvasGroup de uma imagem preta cobrindo a tela. O alpha é gerenciado aqui, " +
+             "tanto faz como ele ficou no editor. Vazio, a cena recarrega seca, sem escurecer.")]
     [SerializeField] private CanvasGroup fadeGroup;
 
     [SerializeField] private float fadeDuration = 1f;
+
+    [Tooltip("A noite abre clareando do preto. Como morrer recarrega a cena, é este fade " +
+             "que emenda no escurecimento da morte em vez de a tela dar um estalo.")]
+    [SerializeField] private bool fadeInOnStart = true;
 
     [Header("Eventos de cena")]
     [Tooltip("Disparado no instante da morte — som de game over, tela de 'a noite te pegou'.")]
@@ -64,9 +68,12 @@ public class NightRunner : MonoBehaviour
         if (inventory == null)
             inventory = FindObjectOfType<PlayerInventory>();
 
-        // Nasce transparente mesmo que tenha ficado preto no editor depois de um teste.
+        // No Awake, senão o primeiro quadro da cena aparece antes de o Start começar a clarear.
         if (fadeGroup != null)
-            fadeGroup.alpha = 0f;
+        {
+            fadeGroup.gameObject.SetActive(true);
+            fadeGroup.alpha = fadeInOnStart ? 1f : 0f;
+        }
     }
 
     private void OnEnable()
@@ -92,6 +99,9 @@ public class NightRunner : MonoBehaviour
         // Sem player a partida não tem como acabar: é cena de teste, não erro fatal.
         if (playerHealth == null)
             Debug.LogWarning($"[NightRunner] '{name}' não achou um PlayerHealth: morrer não vai reiniciar a noite.", this);
+
+        if (fadeInOnStart && fadeGroup != null)
+            StartCoroutine(FadeIn());
     }
 
     private void HandleDied()
@@ -131,28 +141,43 @@ public class NightRunner : MonoBehaviour
         BlockPause();
 
         yield return new WaitForSecondsRealtime(deathDelay);
-        yield return FadeOut();
+        yield return Fade(0f, 1f);
 
         if (restartOnDeath)
             Restart();
     }
 
-    private IEnumerator FadeOut()
+    /// <summary>Clareia na abertura da noite e sai do caminho depois.</summary>
+    private IEnumerator FadeIn()
     {
-        if (fadeGroup == null || fadeDuration <= 0f)
+        yield return Fade(1f, 0f);
+
+        // Transparente ele ainda é uma imagem cobrindo a tela inteira: melhor desligar.
+        fadeGroup.gameObject.SetActive(false);
+    }
+
+    private IEnumerator Fade(float from, float to)
+    {
+        if (fadeGroup == null)
             yield break;
 
         fadeGroup.gameObject.SetActive(true);
+
+        if (fadeDuration <= 0f)
+        {
+            fadeGroup.alpha = to;
+            yield break;
+        }
 
         float elapsed = 0f;
         while (elapsed < fadeDuration)
         {
             elapsed += Time.unscaledDeltaTime;
-            fadeGroup.alpha = Mathf.Clamp01(elapsed / fadeDuration);
+            fadeGroup.alpha = Mathf.Lerp(from, to, Mathf.Clamp01(elapsed / fadeDuration));
             yield return null;
         }
 
-        fadeGroup.alpha = 1f;
+        fadeGroup.alpha = to;
     }
 
     /// <summary>Recomeça a noite do zero. Sem save, reabrir a cena zera tudo junto.</summary>
