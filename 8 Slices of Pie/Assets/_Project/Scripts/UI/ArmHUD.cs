@@ -3,9 +3,12 @@ using UnityEngine.UI;
 
 /// <summary>
 /// A HUD diegética: o braço da Chapéuzinho, com o relógio, a pulseira de corações e as
-/// baterias amarradas. Não fica na tela — ela levanta o braço enquanto a tecla estiver
-/// segurada e abaixa ao soltar, então conferir a hora custa atenção. Substitui a HUD de
-/// cantos do GDD.
+/// baterias amarradas. Não fica na tela — ela levanta o braço junto com a pausa, então
+/// conferir a hora é o mesmo gesto de abrir o menu: ESC mostra o braço na direita e as
+/// opções na esquerda. Substitui a HUD de cantos do GDD.
+///
+/// Não lê teclado: quem escuta o ESC é o <see cref="PauseMenu"/>, e o braço só segue o
+/// <see cref="PauseMenu.IsPaused"/> dele. Sem PauseMenu na cena o braço fica abaixado.
 ///
 /// Vai no objeto raiz do braço, dentro de um Canvas Screen Space – Overlay. A posição em
 /// que ele estiver no Editor é a de braço levantado; a de escondido é ela mais o
@@ -15,10 +18,6 @@ using UnityEngine.UI;
 /// </summary>
 public class ArmHUD : MonoBehaviour
 {
-    [Header("Input")]
-    [Tooltip("Segurar levanta o braço; soltar abaixa.")]
-    [SerializeField] private KeyCode raiseKey = KeyCode.Tab;
-
     [Header("Movimento")]
     [Tooltip("Onde fica o braço abaixado, a partir da posição de repouso, em unidades do " +
              "Canvas. Uma altura de quadro (144) já tira o braço todo da tela.")]
@@ -83,7 +82,12 @@ public class ArmHUD : MonoBehaviour
         if (pauseMenu == null)
             pauseMenu = FindObjectOfType<PauseMenu>();
 
-        // Sem os sistemas o braço ainda levanta: é cena de teste, não erro fatal.
+        // Sem o PauseMenu não há ESC, e o braço não teria como subir — este é o único
+        // que faz falta de verdade.
+        if (pauseMenu == null)
+            Debug.LogWarning($"[ArmHUD] '{name}' não achou um PauseMenu: o braço não vai levantar.", this);
+
+        // Já os outros três só deixam mostradores parados: é cena de teste, não erro fatal.
         if (clock == null)
             Debug.LogWarning($"[ArmHUD] '{name}' não achou um Clock: o relógio não vai andar.", this);
 
@@ -138,10 +142,13 @@ public class ArmHUD : MonoBehaviour
     {
         // Morta ela não levanta mais o braço, e o que estava levantado desce sozinho:
         // a tela de morte é do NightRunner, não é hora de conferir a hora.
-        bool blocked = (pauseMenu != null && pauseMenu.IsPaused)
-                    || (health != null && health.IsDead);
+        bool blocked = health != null && health.IsDead;
 
-        float target = !blocked && Input.GetKey(raiseKey) ? 1f : 0f;
+        // Levantado o tempo todo que a pausa durar — inclusive dentro das opções, que são
+        // a mesma tela um passo adiante.
+        bool showing = pauseMenu != null && pauseMenu.IsPaused;
+
+        float target = showing && !blocked ? 1f : 0f;
 
         // unscaledDeltaTime pra ele terminar o movimento mesmo se a pausa cair no meio.
         float step = slideSeconds > 0f ? Time.unscaledDeltaTime / slideSeconds : 1f;

@@ -44,6 +44,25 @@ Ligar por `Any State`, com `Has Exit Time` desmarcado, duração 0 e
 
 A cena precisa de um **EventSystem**, senão nenhum botão responde a clique.
 
+O ESC é a única tecla de menu do jogo: a mesma pausa que abre os botões levanta o braço
+(veja *HUD diegética*). Por isso os botões ficam na **metade esquerda** da tela — a
+direita é do braço.
+
+Os botões vão dentro de um objeto vazio com `CanvasGroup` + `UIFadeIn`, irmão do fundo
+escuro:
+
+```
+Pause          ← pausePanel do PauseMenu
+├── Background ← Image preta, entra seca junto com a pausa
+└── Buttons    ← CanvasGroup + UIFadeIn, os 4 botões dentro
+```
+
+`UIFadeIn` deixa o grupo transparente e o traz de volta toda vez que o objeto é ligado —
+`delay` pra esperar o braço subir, `duration` pro fade. Ele conta em tempo real, senão o
+`timeScale = 0` da pausa travaria o fade. Enquanto está aparecendo os botões não aceitam
+clique, pra ninguém acertar o *Sair* sem ter visto onde ele estava. Serve em qualquer UI,
+não só na pausa.
+
 > O menu principal ainda não tem botões — a primeira tela é só arte.
 
 ## Itens do mapa
@@ -83,13 +102,44 @@ Lobo inteiro — presença no mapa, `SenseRadius`, `SightRadius`, `ChaseSpeed`,
 `EnemyAtk.Damage` e `FearsLight`. Aplicar um estágio é idempotente: recomeçar a noite é
 só chamar `ApplyStage(0)`.
 
-O que **não** é do Lobo — postes piscando (2ª), luzes da cidade apagando (3ª), sangue nas
-ruas (6ª) — sai pelo `UnityEvent onReached` de cada estágio: ligue o objeto de cena no
-Inspector, sem código. O `cue` toca o som da hora (o uivo distante da 1ª).
+O que **não** é do Lobo — sangue nas ruas (6ª) e o resto da ambientação — sai pelo
+`UnityEvent onReached` de cada estágio: ligue o objeto de cena no Inspector, sem código.
+O `cue` toca o som da hora (o uivo distante da 1ª). Os postes são a exceção: eles escutam
+o relógio por conta própria (veja *Postes da cidade*), senão daria pra arrastar poste por
+poste pro `onReached` de duas fatias.
 
 Dois campos de cena valem configurar: `spawnPoint`, por onde ele entra na 3ª fatia, e o
 `audioSource`. Fora do mapa (antes da 3ª e depois da 8ª) ele não é destruído — a IA trava
 e renderers e colliders desligam, pra ele poder voltar.
+
+## Postes da cidade
+
+`StreetLamp` vai na raiz de cada poste, com o Light2D num filho:
+
+```
+Poste
+├── Sprite     ← o poste1.aseprite
+└── LampLight  ← Light2D (Spot, Inner/Outer Angle 360, como o do lampião)
+```
+
+Um script por poste, cada um achando o `Clock` sozinho — não precisa ligar nada no
+Inspector. Ele é a tabela de iluminação da seção 05 do GDD:
+
+| Fatia | Hora | Poste |
+|---|---|---|
+| 0–1 | 22:00 · 23:00 | aceso, a cidade é legível |
+| 2 | 00:00 | piscada curta de aviso |
+| 3+ | 01:00 em diante | apagado, e não volta |
+
+As duas fatias vêm dos campos `flickerAtSlice` e `blackoutAtSlice`. O `flickerJitter`
+sorteia um atraso por poste, senão a cidade inteira pisca no mesmo quadro e vira um flash
+só. `alwaysOn` ignora o relógio — é a regra da conveniência, o único ponto de luz que o
+GDD mantém a noite toda.
+
+`StartFlicker()` dispara a piscada sozinha, pra testar sem coletar duas fatias.
+
+> Poste com `Scale` diferente de 1 multiplica o raio do Light2D filho junto. Ajuste o
+> *Outer Radius* no olho, ou tire a escala do pai.
 
 ## IA do Lobo
 
@@ -115,7 +165,9 @@ e renderers e colliders desligam, pra ele poder voltar.
 ## HUD diegética — o braço
 
 `ArmHUD` é o braço dela: relógio, pulseira e as baterias amarradas. Não fica na tela —
-segurar **TAB** levanta, soltar abaixa. Monte num Canvas *Screen Space – Overlay*:
+sobe junto com a pausa e desce ao voltar pro jogo. Ele **não lê teclado**: só segue o
+`IsPaused` do `PauseMenu`, então o **ESC** abre as duas coisas de uma vez — braço na
+direita, botões na esquerda. Monte num Canvas *Screen Space – Overlay*:
 
 ```
 ArmHUD      ← RectTransform + ArmHUD, na posição de braço LEVANTADO
