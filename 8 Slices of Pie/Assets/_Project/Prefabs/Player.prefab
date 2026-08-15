@@ -215,6 +215,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lampLight: {fileID: 8094785595174207805}
+  fallbackLightRadius: 5
   barsPerBattery: 4
   secondsPerBar: 15
   spareBatteries: 0
@@ -271,7 +272,9 @@ MonoBehaviour:
   stepInterval: 0.45
   stepNoiseRadius: 6
   audioSource: {fileID: 2845956506244861656}
-  stepClips: []
+  stepClips:
+  - {fileID: 8300000, guid: 0f4ba0c3a8ac845418a35f50897d36d7, type: 3}
+  - {fileID: 8300000, guid: 7c3043768735f254991b051e89a8c411, type: 3}
   crouchVolume: 0.35
 --- !u!114 &5164574952349409626
 MonoBehaviour:

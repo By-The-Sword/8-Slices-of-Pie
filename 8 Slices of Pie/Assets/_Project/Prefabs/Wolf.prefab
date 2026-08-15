@@ -373,6 +373,11 @@ MonoBehaviour:
   chaseVolumeBoost: 1.3
   chaseBreathPitch: 1.2
   chaseGrowlInterval: {x: 3, y: 6}
+  grassClips:
+  - {fileID: 8300000, guid: 7a5fb4a83ab27cb4b8ddcfa657b0fc99, type: 3}
+  grassDistance: 9
+  grassInterval: {x: 2, y: 5}
+  grassVolume: 0.8
   patrolHowlInterval: {x: 25, y: 60}
 --- !u!82 &-997654893857413106
 AudioSource:

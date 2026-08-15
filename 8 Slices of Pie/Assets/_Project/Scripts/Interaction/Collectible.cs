@@ -35,6 +35,11 @@ public class Collectible : MonoBehaviour, IInteractable
     [Tooltip("Desmarque pra só esconder o objeto — útil pra quem precisa reaparecer depois.")]
     [SerializeField] private bool destroyOnCollect = true;
 
+    [Tooltip("Som de pegar. Sai pelo AudioSource de quem catou, e não daqui: este objeto é " +
+             "destruído no mesmo quadro e levaria o som junto. Por item, pra chave poder " +
+             "soar diferente da fatia.")]
+    [SerializeField] private AudioClip pickupClip;
+
     public string ItemId => itemId;
     public string DisplayName => displayName;
     public int Amount => amount;
@@ -69,12 +74,23 @@ public class Collectible : MonoBehaviour, IInteractable
             return;
 
         Collected = true;
+        PlayPickup(interactor);
         OnAnyCollected?.Invoke(this, interactor);
 
         if (destroyOnCollect)
             Destroy(gameObject);
         else
             gameObject.SetActive(false);
+    }
+
+    private void PlayPickup(GameObject interactor)
+    {
+        if (pickupClip == null || interactor == null)
+            return;
+
+        AudioSource source = interactor.GetComponentInParent<AudioSource>();
+        if (source != null)
+            source.PlayOneShot(pickupClip);
     }
 
     private void Reset()

@@ -103,6 +103,7 @@ MonoBehaviour:
   amount: 1
   promptOverride: You took a slice of pie!
   destroyOnCollect: 1
+  pickupClip: {fileID: 8300000, guid: 17d3766ff270d2548bc530ac716c2a38, type: 3}
 --- !u!60 &4943042094171116878
 PolygonCollider2D:
   m_ObjectHideFlags: 0

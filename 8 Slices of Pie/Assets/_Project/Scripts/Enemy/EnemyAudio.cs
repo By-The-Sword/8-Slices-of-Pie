@@ -102,6 +102,21 @@ public class EnemyAudio : MonoBehaviour
     [Tooltip("Intervalo entre rosnados enquanto persegue (mín, máx). X em 0 rosna só na largada.")]
     [SerializeField] private Vector2 chaseGrowlInterval = new Vector2(3f, 6f);
 
+    [Header("Grama")]
+    [Tooltip("Mato mexendo: só sai com ele perto e fora do quadro. Dentro da tela ela já o vê, " +
+             "e o susto de ouvir onde não se enxerga é justamente o ponto.")]
+    [SerializeField] private AudioClip[] grassClips;
+
+    [Tooltip("Distância máxima pro mato mexer. Menor que a audição geral: é 'ele está aqui do " +
+             "lado', não 'ele existe na cidade'.")]
+    [SerializeField] private float grassDistance = 9f;
+
+    [Tooltip("Intervalo entre um farfalhar e outro (mín, máx). X em 0 desliga.")]
+    [SerializeField] private Vector2 grassInterval = new Vector2(2f, 5f);
+
+    [Range(0f, 1f)]
+    [SerializeField] private float grassVolume = 0.8f;
+
     [Header("Ronda")]
     [Tooltip("Intervalo entre uivos de ambientação na patrulha (mín, máx). X em 0 desliga. " +
              "Espaçado de propósito: uivo demais vira ruído de fundo e para de assustar.")]
@@ -112,10 +127,12 @@ public class EnemyAudio : MonoBehaviour
     private EnemyAtk attack;
     private Rigidbody2D body;
     private Transform player;
+    private Camera view;
     private float stepTravel;
     private float basePitch = 1f;
     private float growlTimer;
     private float howlTimer;
+    private float grassTimer;
 
     /// <summary>Último sorteado de cada categoria — é o que impede o mesmo clipe duas vezes seguidas.</summary>
     private int lastStep = -1;
@@ -123,6 +140,7 @@ public class EnemyAudio : MonoBehaviour
     private int lastAttack = -1;
     private int lastHowl = -1;
     private int lastLament = -1;
+    private int lastGrass = -1;
 
     private void Awake()
     {
@@ -155,6 +173,7 @@ public class EnemyAudio : MonoBehaviour
             voiceSource.spatialBlend = 0f;
 
         howlTimer = RandomInterval(patrolHowlInterval);
+        grassTimer = RandomInterval(grassInterval);
     }
 
     private void OnEnable()
@@ -194,7 +213,52 @@ public class EnemyAudio : MonoBehaviour
 
         TickBreath(volume, pan, chasing);
         TickFootsteps(volume, pan, chasing);
+        TickGrass(pan);
         TickVoices(chasing);
+    }
+
+    /// <summary>
+    /// O mato mexendo enquanto ele está perto e fora do quadro. É o único som que depende
+    /// da câmera, e não da distância: assim que ele entra na tela, cala — a partir daí quem
+    /// avisa são os olhos dela.
+    /// </summary>
+    private void TickGrass(float pan)
+    {
+        if (grassInterval.x <= 0f || grassClips == null || grassClips.Length == 0)
+            return;
+
+        if (!IsOffScreen() || Vector2.Distance(transform.position, player.position) > grassDistance)
+        {
+            // Rearma: sumindo do quadro de novo, o mato mexe na hora em vez de esperar o ciclo.
+            grassTimer = RandomInterval(grassInterval);
+            return;
+        }
+
+        grassTimer -= Time.deltaTime;
+        if (grassTimer > 0f)
+            return;
+
+        grassTimer = RandomInterval(grassInterval);
+
+        AudioClip clip = PickRandom(grassClips, ref lastGrass);
+        if (clip == null || stepSource == null)
+            return;
+
+        stepSource.panStereo = pan;
+        stepSource.PlayOneShot(clip, grassVolume);
+    }
+
+    /// <summary>Ele está fora do que a câmera mostra. Sem câmera, assume que está à vista.</summary>
+    private bool IsOffScreen()
+    {
+        if (view == null)
+            view = Camera.main;
+
+        if (view == null)
+            return false;
+
+        Vector3 point = view.WorldToViewportPoint(transform.position);
+        return point.x < 0f || point.x > 1f || point.y < 0f || point.y > 1f;
     }
 
     /// <summary>
@@ -406,6 +470,7 @@ public class EnemyAudio : MonoBehaviour
             breathSource.Stop();
 
         stepTravel = stepDistance;
+        grassTimer = RandomInterval(grassInterval);
     }
 
     private void OnDrawGizmosSelected()

@@ -148,3 +148,4 @@ MonoBehaviour:
   amount: 1
   promptOverride: 
   destroyOnCollect: 1
+  pickupClip: {fileID: 8300000, guid: 17d3766ff270d2548bc530ac716c2a38, type: 3}
