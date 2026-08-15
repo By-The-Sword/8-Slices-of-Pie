@@ -19,6 +19,12 @@ Tudo por Inspector, sem mexer em código. Os campos são opcionais e o jogo roda
 - **Passos** → `PlayerFootsteps`: `stepClips` (array, ele sorteia um), `audioSource`,
   `stepInterval` (ritmo), `crouchVolume`.
 - **Lampião** → `Lantern`: `toggleOnClip`, `toggleOffClip`, `batterySwapClip`.
+- **Item** → `pickupClip` de cada `Collectible`. Toca pelo AudioSource de quem catou,
+  porque o objeto some no mesmo quadro.
+- **Interface** → `UISounds`, um por Canvas. Ele acha os `Button` filhos sozinho e pendura
+  hover e clique; `pauseInClip`/`pauseOutClip` vêm do `PauseMenu`. O `startClip` é o único
+  que não sai sozinho: ligue `PlayStart()` no OnClick do botão da primeira tela.
+- **Grama** → `EnemyAudio`: `grassClips` só sai com o Lobo perto e **fora do quadro**.
 
 ## Animação
 
@@ -29,6 +35,16 @@ O `PlayerAnimatorBridge` escreve no Animator do filho `Sprite`. Os nomes têm qu
 *2D Simple Directional* com os clipes em `(0,-1) (0,1) (-1,0) (1,0)`.
 Ligar por `Any State`, com `Has Exit Time` desmarcado, duração 0 e
 **`Can Transition To Self` desmarcado** (senão a animação congela no 1º quadro).
+
+## Pausa
+
+`PauseMenu` não tem código de UI: os botões chamam `Resume()`, `OpenOptions()`,
+`GoToMainMenu()` e `QuitGame()` pelo `OnClick` do Inspector. O painel vai no campo
+`pausePanel` e nasce desligado sozinho; `optionsPanel` pode ficar vazio.
+
+A cena precisa de um **EventSystem**, senão nenhum botão responde a clique.
+
+> O menu principal ainda não tem botões — a primeira tela é só arte.
 
 ## Itens do mapa
 
@@ -96,5 +112,27 @@ e renderers e colliders desligam, pra ele poder voltar.
 - Light2D do lampião: **Spot** com Inner/Outer Angle em **360** (senão vira cone).
 - `Graphics > Transparency Sort Mode` = Custom Axis, eixo `(0,1,0)` — Y-sorting.
 
-> HUD/pulseira ainda não definida — a combinar com quem for fazer.
-> Os scripts já expõem tudo por evento, então nada aqui precisa mudar.
+## HUD diegética — o braço
+
+`ArmHUD` é o braço dela: relógio, pulseira e as baterias amarradas. Não fica na tela —
+segurar **TAB** levanta, soltar abaixa. Monte num Canvas *Screen Space – Overlay*:
+
+```
+ArmHUD      ← RectTransform + ArmHUD, na posição de braço LEVANTADO
+├── Arm     ← Image, Arm.png
+├── Clock   ← Image ┐
+├── Bracelet ← Image ├ por cima do braço, na ordem de desenho
+└── Battery ← Image ┘
+```
+
+Todo quadro é **160×144** com o elemento já posicionado: Canvas Scaler em *Scale With
+Screen Size*, `160 × 144`, Match **Height**, e as 4 Images com o mesmo rect do `ArmHUD` —
+aí relógio, pulseira e baterias caem sozinhos no lugar certo do braço.
+
+Os três arrays vão **na ordem da folha**, do cheio pro vazio: relógio `23:00 → 06:00` (8),
+pulseira `3 → 1` coração (3), bateria `4 → 0` barras (5). As referências de `Clock`,
+`PlayerHealth`, `Lantern` e `PauseMenu` podem ficar vazias — ele acha na cena.
+
+Não existe quadro de **22:00** na folha, então na primeira hora da noite o relógio fica
+apagado. A bateria mostra a carga do lampião (`BarsRemaining`), não quantas reserva ela
+tem — isso ainda não aparece em lugar nenhum.
