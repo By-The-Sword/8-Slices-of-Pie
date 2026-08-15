@@ -33,14 +33,19 @@ public class ArmHUD : MonoBehaviour
     [SerializeField] private Image batteryImage;
 
     [Header("Sprites")]
-    [Tooltip("Na ordem da folha: 23:00, 00:00... até 06:00. Não existe quadro de 22:00, " +
-             "então na primeira hora da noite o relógio fica desligado.")]
+    [Tooltip("Na ordem da folha: 23:00, 00:00... até 06:00. São as 8 fatias da noite.")]
     [SerializeField] private Sprite[] clockSprites;
+
+    [Tooltip("Quadro de 22:00, a hora em que a noite abre. Fica fora do array porque a " +
+             "folha do relógio começa em 23:00 — é o clock22.png. Vazio, ela sai de casa " +
+             "com o relógio apagado.")]
+    [SerializeField] private Sprite nightStartSprite;
 
     [Tooltip("Na ordem da folha, do cheio pro vazio: 3, 2 e 1 coração. Um quadro por coração.")]
     [SerializeField] private Sprite[] braceletSprites;
 
-    [Tooltip("Na ordem da folha, do cheio pro vazio: 4, 3, 2, 1 e 0 barras de carga.")]
+    [Tooltip("Na ordem da folha, do cheio pro vazio: 4, 3, 2, 1 e 0 baterias reserva — " +
+             "as 4 que o GDD espalha pelo mapa, um slot pra cada.")]
     [SerializeField] private Sprite[] batterySprites;
 
     [Header("Referências")]
@@ -116,7 +121,7 @@ public class ArmHUD : MonoBehaviour
             health.OnHeartsChanged += HandleHeartsChanged;
 
         if (lantern != null)
-            lantern.OnChargeChanged += HandleChargeChanged;
+            lantern.OnSpareBatteriesChanged += HandleSpareBatteriesChanged;
     }
 
     private void OnDisable()
@@ -128,7 +133,7 @@ public class ArmHUD : MonoBehaviour
             health.OnHeartsChanged -= HandleHeartsChanged;
 
         if (lantern != null)
-            lantern.OnChargeChanged -= HandleChargeChanged;
+            lantern.OnSpareBatteriesChanged -= HandleSpareBatteriesChanged;
     }
 
     private void Start()
@@ -166,7 +171,7 @@ public class ArmHUD : MonoBehaviour
             HandleHeartsChanged(health.Hearts, health.MaxHearts);
 
         if (lantern != null)
-            HandleChargeChanged(lantern.BarsRemaining, lantern.CurrentBarFill);
+            HandleSpareBatteriesChanged(lantern.SpareBatteries);
     }
 
     private void HandleHourChanged(int hour, string text) => ApplyClock();
@@ -176,10 +181,22 @@ public class ArmHUD : MonoBehaviour
         if (clockImage == null)
             return;
 
-        // A folha começa às 23:00, que é a 1ª fatia — daí o -1. Se um dia entrar o quadro
-        // de 22:00 no começo do array, este -1 é a única linha que muda.
-        int index = (clock != null ? clock.HoursElapsed : 0) - 1;
-        Show(clockImage, clockSprites, index);
+        int slices = clock != null ? clock.HoursElapsed : 0;
+
+        // Com 0 fatias são 22:00, hora que a folha não cobre: ela começa na 1ª fatia, às
+        // 23:00. O quadro de abertura vem solto, num campo só dele.
+        if (slices <= 0)
+        {
+            clockImage.enabled = nightStartSprite != null;
+
+            if (nightStartSprite != null)
+                clockImage.sprite = nightStartSprite;
+
+            return;
+        }
+
+        // Daí em diante a fatia indexa a folha direto: a 1ª é o quadro 0.
+        Show(clockImage, clockSprites, slices - 1);
     }
 
     private void HandleHeartsChanged(int hearts, int max)
@@ -190,10 +207,18 @@ public class ArmHUD : MonoBehaviour
         Show(braceletImage, braceletSprites, index);
     }
 
-    private void HandleChargeChanged(int bars, float fill)
+    /// <summary>
+    /// Quantas baterias ela ainda carrega, não a carga da que está no lampião: o cinto tem
+    /// um slot por bateria reserva, e eles vão vazando conforme a noite consome as 4 do mapa.
+    /// </summary>
+    private void HandleSpareBatteriesChanged(int spares)
     {
-        // Aqui o vazio tem quadro: 4 barras é o 0, 0 barras é o último.
-        int index = batterySprites != null ? batterySprites.Length - 1 - bars : -1;
+        // Aqui o vazio tem quadro: 4 reservas é o 0, nenhuma reserva é o último. Achar uma
+        // 5ª bateria cairia fora do array pela esquerda, então o índice fica preso no 0.
+        int index = batterySprites != null
+            ? Mathf.Max(0, batterySprites.Length - 1 - spares)
+            : -1;
+
         Show(batteryImage, batterySprites, index);
     }
 
