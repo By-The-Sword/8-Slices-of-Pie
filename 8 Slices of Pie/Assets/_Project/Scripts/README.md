@@ -182,9 +182,20 @@ Screen Size*, `160 × 144`, Match **Height**, e as 4 Images com o mesmo rect do 
 aí relógio, pulseira e baterias caem sozinhos no lugar certo do braço.
 
 Os três arrays vão **na ordem da folha**, do cheio pro vazio: relógio `23:00 → 06:00` (8),
-pulseira `3 → 1` coração (3), bateria `4 → 0` barras (5). As referências de `Clock`,
+pulseira `3 → 1` coração (3), bateria `4 → 0` reservas (5). As referências de `Clock`,
 `PlayerHealth`, `Lantern` e `PauseMenu` podem ficar vazias — ele acha na cena.
 
-Não existe quadro de **22:00** na folha, então na primeira hora da noite o relógio fica
-apagado. A bateria mostra a carga do lampião (`BarsRemaining`), não quantas reserva ela
-tem — isso ainda não aparece em lugar nenhum.
+Cada mostrador tem sua fonte, e todos se redesenham por evento, não por frame:
+
+| Mostrador | Lê de | Evento |
+|---|---|---|
+| Relógio | `Clock.HoursElapsed` | `OnHourChanged` |
+| Pulseira | `PlayerHealth.Hearts` | `OnHeartsChanged` |
+| Bateria | `Lantern.SpareBatteries` | `OnSpareBatteriesChanged` |
+
+A folha do relógio começa em **23:00**, a 1ª fatia — as 22:00 da abertura ficam de fora.
+O quadro delas é o `clock22.png`, um arquivo só dele, que vai no campo `nightStartSprite`.
+Vazio, ela sai de casa com o relógio apagado. A bateria conta as **reservas** — os 4 slots são as 4 baterias do mapa —, então
+ela começa a noite vazia mesmo com o lampião cheio. A carga da bateria em uso
+(`BarsRemaining`) não aparece em lugar nenhum: pra mostrar ela no lugar das reservas,
+troque a fonte de `HandleSpareBatteriesChanged` no `ArmHUD`.
