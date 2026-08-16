@@ -61,7 +61,7 @@ public class PlayerController : MonoBehaviour
 
         IsMoving = moveInput.sqrMagnitude > 0.01f;
         if (IsMoving)
-            Facing = ToCardinal(moveInput);
+            Facing = ToOctant(moveInput);
 
         if (Input.GetKeyDown(crouchKey))
             SetCrouched(!IsCrouched);
@@ -94,10 +94,13 @@ public class PlayerController : MonoBehaviour
             body.velocity = Vector2.zero;
     }
 
-    private static Vector2 ToCardinal(Vector2 direction)
+    private static Vector2 ToOctant(Vector2 direction)
     {
-        return Mathf.Abs(direction.x) > Mathf.Abs(direction.y)
-            ? new Vector2(Mathf.Sign(direction.x), 0f)
-            : new Vector2(0f, Mathf.Sign(direction.y));
+        // Trava em 8 direções, já normalizado — Facing também alimenta o alcance
+        // do PlayerInteractor e o knockback, que ficariam 41% maiores na diagonal.
+        float angle = Mathf.Atan2(direction.y, direction.x);
+        float step = Mathf.PI / 4f;
+        float snapped = Mathf.Round(angle / step) * step;
+        return new Vector2(Mathf.Cos(snapped), Mathf.Sin(snapped));
     }
 }

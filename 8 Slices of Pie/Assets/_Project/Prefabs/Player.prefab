@@ -257,6 +257,8 @@ MonoBehaviour:
   moveYParam: MoveY
   isMovingParam: IsMoving
   isCrouchedParam: IsCrouched
+  spriteFacesRight: 1
+  spriteRenderer: {fileID: 5181188234098982709}
 --- !u!114 &5188239643968595170
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -368,7 +370,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.45, z: 0}
-  m_LocalScale: {x: 0.6, y: 0.9, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7433413718883466650}
@@ -414,7 +416,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a35cdf5945f43d442be17cb9153379cc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -435,7 +437,7 @@ Animator:
   m_GameObject: {fileID: 5675362763760543918}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9e2ce859fa61466e97710326d4776436, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
