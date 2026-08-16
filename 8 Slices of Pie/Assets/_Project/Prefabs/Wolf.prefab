@@ -16,6 +16,8 @@ GameObject:
   - component: {fileID: -997021173583838569}
   - component: {fileID: -3530153089835368317}
   - component: {fileID: -997654893857413106}
+  - component: {fileID: 6770466855632623343}
+  - component: {fileID: -3803957981416732284}
   m_Layer: 0
   m_Name: Wolf
   m_TagString: Untagged
@@ -33,7 +35,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.1, y: 0.22, z: 0}
-  m_LocalScale: {x: 0.4626, y: 0.4626, z: 0.4626}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -79,7 +81,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee, type: 3}
+  m_Sprite: {fileID: -683965676, guid: 8217150582ce7ce478417822c2e57fef, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -182,7 +184,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clock: {fileID: 0}
   spawnPoint: {fileID: 0}
-  audioSource: {fileID: 0}
+  audioSource: {fileID: -997654893857413106}
   lightLureInterval: 0.5
   lightLureRadius: 25
   stages:
@@ -192,6 +194,7 @@ MonoBehaviour:
     sightRadius: 10
     chaseSpeed: 4
     biteDamage: 1
+    controller: {fileID: 0}
     fearsLight: 1
     attractedByLight: 0
     tracksBlood: 0
@@ -205,6 +208,7 @@ MonoBehaviour:
     sightRadius: 10
     chaseSpeed: 4
     biteDamage: 1
+    controller: {fileID: 0}
     fearsLight: 1
     attractedByLight: 0
     tracksBlood: 0
@@ -230,6 +234,7 @@ MonoBehaviour:
     sightRadius: 10
     chaseSpeed: 4
     biteDamage: 1
+    controller: {fileID: 0}
     fearsLight: 1
     attractedByLight: 0
     tracksBlood: 0
@@ -243,6 +248,7 @@ MonoBehaviour:
     sightRadius: 10
     chaseSpeed: 4
     biteDamage: 1
+    controller: {fileID: 0}
     fearsLight: 1
     attractedByLight: 0
     tracksBlood: 0
@@ -256,6 +262,7 @@ MonoBehaviour:
     sightRadius: 10
     chaseSpeed: 4
     biteDamage: 1
+    controller: {fileID: 0}
     fearsLight: 1
     attractedByLight: 0
     tracksBlood: 1
@@ -269,19 +276,33 @@ MonoBehaviour:
     sightRadius: 10
     chaseSpeed: 4
     biteDamage: 2
+    controller: {fileID: 9100000, guid: 9c3705fcef7a7014a981b064d1bc74f3, type: 2}
     fearsLight: 1
     attractedByLight: 0
     tracksBlood: 1
-    cue: {fileID: 0}
+    cue: {fileID: 8300000, guid: e855723d8eaa0f142bd172ad973e83e5, type: 3}
     onReached:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: 
+          m_MethodName: 
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
   - label: "04:00 \xB7 A cidade amanhece coberta de sangue"
     present: 1
     senseRadius: 12
     sightRadius: 10
     chaseSpeed: 4
     biteDamage: 2
+    controller: {fileID: 9100000, guid: 9c3705fcef7a7014a981b064d1bc74f3, type: 2}
     fearsLight: 1
     attractedByLight: 0
     tracksBlood: 1
@@ -295,6 +316,7 @@ MonoBehaviour:
     sightRadius: 10
     chaseSpeed: 4
     biteDamage: 2
+    controller: {fileID: 9100000, guid: 9c3705fcef7a7014a981b064d1bc74f3, type: 2}
     fearsLight: 0
     attractedByLight: 1
     tracksBlood: 1
@@ -308,6 +330,7 @@ MonoBehaviour:
     sightRadius: 10
     chaseSpeed: 4
     biteDamage: 2
+    controller: {fileID: 0}
     fearsLight: 0
     attractedByLight: 1
     tracksBlood: 1
@@ -327,17 +350,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9200240b2e8fc445b8083c74f4b881b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  breathSource: {fileID: 0}
-  stepSource: {fileID: 0}
+  breathSource: {fileID: -997654893857413106}
+  stepSource: {fileID: -997654893857413106}
   voiceSource: {fileID: -997654893857413106}
   breathLoop: {fileID: 0}
-  stepClips: []
+  stepClips:
+  - {fileID: 8300000, guid: 7a5fb4a83ab27cb4b8ddcfa657b0fc99, type: 3}
+  - {fileID: 8300000, guid: 7a5fb4a83ab27cb4b8ddcfa657b0fc99, type: 3}
   growlClips:
   - {fileID: 8300000, guid: 0adb8118bb007884a98702e4bfeaa5b9, type: 3}
-  attackClips: []
+  attackClips:
+  - {fileID: 8300000, guid: 8296b6a625157bd4eb3f0b0ddc9be3d0, type: 3}
   howlClips:
   - {fileID: 8300000, guid: b60d2395619e6d047ac00df776ce242c, type: 3}
-  lamentClips: []
+  - {fileID: 8300000, guid: 463de1557bbf3f74bb957cfc5e511f8a, type: 3}
+  lamentClips:
+  - {fileID: 8300000, guid: 95873a1788bea3349a4cf60dc2f8bb1c, type: 3}
   nearDistance: 2
   farDistance: 18
   falloff:
@@ -475,3 +503,44 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!95 &6770466855632623343
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7467585422729443407}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8f52747399814294db460cf7e9c4564e, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-3803957981416732284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7467585422729443407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 672558cf26c0c9047a66a419de88a621, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 6770466855632623343}
+  spriteRenderer: {fileID: 3721773589274828135}
+  isMovingParam: IsMoving
+  moveSpeedParam: MoveSpeed
+  attackParam: Attack
+  baseSpeed: 1.8
+  speedRange: {x: 0.6, y: 2}
+  artFacesRight: 1

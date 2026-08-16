@@ -26,6 +26,12 @@ public class WolfStage
     [Tooltip("Corações por mordida. Vira 2 na 5ª fatia, quando ele cria garras.")]
     public int biteDamage = 1;
 
+    [Header("Aparência")]
+    [Tooltip("Controller do Animator nesta hora — é por aqui que entra o Lobo de garras " +
+             "maiores. Vazio usa o que o prefab já tinha, então os estágios antes da " +
+             "transformação continuam com o Lobo comum sem você preencher nada.")]
+    public RuntimeAnimatorController controller;
+
     [Header("Lampião")]
     [Tooltip("Foge do círculo de luz. Desliga na 7ª fatia.")]
     public bool fearsLight = true;
@@ -120,14 +126,22 @@ public class EnemyHabilities : MonoBehaviour
     private EnemyMov movement;
     private EnemyAtk attack;
     private Lantern lantern;
+    private Animator animator;
     private Renderer[] renderers;
     private Collider2D[] colliders;
     private float lureTimer;
+
+    /// <summary>O controller com que o prefab nasceu — o Lobo comum, sem as garras maiores.</summary>
+    private RuntimeAnimatorController defaultController;
 
     private void Awake()
     {
         movement = GetComponent<EnemyMov>();
         attack = GetComponent<EnemyAtk>();
+        animator = GetComponentInChildren<Animator>(true);
+
+        if (animator != null)
+            defaultController = animator.runtimeAnimatorController;
 
         // Guardados uma vez: são eles que somem do mapa antes da 3ª fatia e depois da 8ª.
         renderers = GetComponentsInChildren<Renderer>(true);
@@ -235,6 +249,7 @@ public class EnemyHabilities : MonoBehaviour
             attack.Damage = stage.biteDamage;
 
         TracksBlood = stage.tracksBlood;
+        SetController(stage.controller);
         SetPresent(stage.present);
 
         // A ambientação da hora só sai quando a hora vira de verdade.
@@ -247,6 +262,26 @@ public class EnemyHabilities : MonoBehaviour
         }
 
         OnStageChanged?.Invoke(StageIndex, stage);
+    }
+
+    /// <summary>
+    /// Troca a aparência do Lobo — é aqui que ele ganha as garras maiores. Estágio com o
+    /// campo vazio volta pro controller original do prefab, e não "mantém o de agora": cada
+    /// linha da tabela descreve o Lobo <b>inteiro</b> naquela hora. É isso que faz recomeçar
+    /// a noite devolver o Lobo comum sem nenhuma lógica de "ele já tinha virado".
+    /// </summary>
+    private void SetController(RuntimeAnimatorController next)
+    {
+        if (animator == null)
+            return;
+
+        if (next == null)
+            next = defaultController;
+
+        // Reatribuir o mesmo controller reinicia a máquina de estados do Animator: o Lobo
+        // daria um solavanco de volta pro idle a cada virada de hora, no meio da caçada.
+        if (animator.runtimeAnimatorController != next)
+            animator.runtimeAnimatorController = next;
     }
 
     /// <summary>
