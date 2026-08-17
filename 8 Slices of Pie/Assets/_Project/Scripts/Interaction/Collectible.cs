@@ -18,6 +18,9 @@ public interface IItemCollector
 /// Pode exigir uma ferramenta: a torta em cima da árvore com o <see cref="requirement"/>
 /// pedindo o galho não é coletada sem ele — o prompt vira "Não alcanço" e o E só solta o
 /// recado no canvas. Veja o <see cref="ItemRequirement"/>.
+///
+/// E pode cair antes de ser catada: com um <see cref="KnockDown"/> no mesmo objeto, o E que
+/// passa pela tranca derruba em vez de coletar, e a fatia é pega do chão depois.
 /// </summary>
 public class Collectible : MonoBehaviour, IInteractable
 {
@@ -39,6 +42,12 @@ public class Collectible : MonoBehaviour, IInteractable
     [Tooltip("Item que ela precisa estar carregando pra conseguir pegar este — o galho pra " +
              "alcançar a torta da árvore. Item Id vazio deixa o objeto livre.")]
     [SerializeField] private ItemRequirement requirement = new ItemRequirement("Não alcanço");
+
+    [Header("Queda")]
+    [Tooltip("Opcional: em vez de ir direto pro inventário, o objeto cai no chão primeiro — a " +
+             "torta que o galho derruba da árvore. Vazio busca um KnockDown neste mesmo objeto, " +
+             "então basta adicionar o componente.")]
+    [SerializeField] private KnockDown knockDown;
 
     [Header("Ao coletar")]
     [Tooltip("Desmarque pra só esconder o objeto — útil pra quem precisa reaparecer depois.")]
@@ -64,7 +73,9 @@ public class Collectible : MonoBehaviour, IInteractable
     /// </summary>
     private bool lockedForLastAsked;
 
-    public string Prompt => lockedForLastAsked ? requirement.LockedPrompt : PickupPrompt;
+    public string Prompt => lockedForLastAsked ? requirement.LockedPrompt
+        : WaitingToFall ? knockDown.Prompt
+        : PickupPrompt;
 
     private string PickupPrompt => string.IsNullOrEmpty(promptOverride)
         ? composedPrompt ??= $"Pegar {displayName}"
@@ -82,8 +93,21 @@ public class Collectible : MonoBehaviour, IInteractable
         if (GetComponentInChildren<Collider2D>() == null)
             Debug.LogWarning($"[Collectible] '{name}' não tem Collider2D: o E nunca vai achar ele.", this);
 
+        if (knockDown == null)
+            knockDown = GetComponent<KnockDown>();
+
         requirement.Warn(this);
     }
+
+    /// <summary>Ainda pendurado: o E derruba, e catar fica pra depois.</summary>
+    private bool WaitingToFall => knockDown != null && knockDown.Pending;
+
+    /// <summary>
+    /// Com uma queda pelo meio, a tranca guarda a <b>derrubada</b>, e não o item no chão: uma
+    /// vez caída, a torta se pega sem o galho — que pode ter quebrado justamente ao derrubá-la.
+    /// </summary>
+    private bool IsLockedFor(GameObject interactor) =>
+        (knockDown == null || knockDown.Pending) && requirement.IsLockedFor(interactor);
 
     /// <summary>
     /// A tranca <b>não</b> entra aqui: um item fora de alcance aceita o E e responde que falta
@@ -91,8 +115,10 @@ public class Collectible : MonoBehaviour, IInteractable
     /// </summary>
     public bool CanInteract(GameObject interactor)
     {
-        lockedForLastAsked = requirement.IsLockedFor(interactor);
-        return !Collected;
+        lockedForLastAsked = IsLockedFor(interactor);
+
+        // No meio da queda ele sai do foco: o prompt some e o E não pega a torta no ar.
+        return !Collected && (knockDown == null || !knockDown.Falling);
     }
 
     /// <summary>Trava e destrava por condição que não é item, pra ligar num UnityEvent da cena.</summary>
@@ -100,12 +126,21 @@ public class Collectible : MonoBehaviour, IInteractable
 
     public void Interact(GameObject interactor)
     {
-        if (Collected)
+        if (Collected || (knockDown != null && knockDown.Falling))
             return;
 
-        if (requirement.IsLockedFor(interactor))
+        if (IsLockedFor(interactor))
         {
             requirement.Deny(interactor);
+            return;
+        }
+
+        // Ainda pendurado: este E derruba, e o próximo é que cata. O item da tranca é cobrado
+        // aqui — o galho quebra na derrubada, não na hora de abaixar pra pegar a fatia.
+        if (WaitingToFall)
+        {
+            requirement.Spend(interactor);
+            knockDown.Drop(interactor);
             return;
         }
 
@@ -115,7 +150,12 @@ public class Collectible : MonoBehaviour, IInteractable
             return;
 
         Collected = true;
-        requirement.Spend(interactor);
+
+        // Com queda pelo meio, a tranca já foi cobrada lá — cobrar de novo levaria um segundo
+        // galho de quem estivesse com dois.
+        if (knockDown == null)
+            requirement.Spend(interactor);
+
         PlayPickup(interactor);
         OnAnyCollected?.Invoke(this, interactor);
 

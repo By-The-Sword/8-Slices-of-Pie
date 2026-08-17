@@ -66084,6 +66084,8 @@ MonoBehaviour:
   background: {fileID: 80328939}
   interactor: {fileID: 0}
   pauseMenu: {fileID: 0}
+  onlyOnInteract: 1
+  interactSeconds: 1
   flashSeconds: 1.2
 --- !u!114 &80328939
 MonoBehaviour:
@@ -67866,10 +67868,69 @@ PrefabInstance:
       propertyPath: m_SortingOrder
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 4943042094171116878, guid: c46846da8c02e94449f5693d9563fc52, type: 3}
+      propertyPath: m_Points.m_Paths.Array.data[0].Array.data[0].x
+      value: -0.6170845
+      objectReference: {fileID: 0}
+    - target: {fileID: 4943042094171116878, guid: c46846da8c02e94449f5693d9563fc52, type: 3}
+      propertyPath: m_Points.m_Paths.Array.data[0].Array.data[0].y
+      value: 5.3705387
+      objectReference: {fileID: 0}
+    - target: {fileID: 4943042094171116878, guid: c46846da8c02e94449f5693d9563fc52, type: 3}
+      propertyPath: m_Points.m_Paths.Array.data[0].Array.data[1].x
+      value: -6.479521
+      objectReference: {fileID: 0}
+    - target: {fileID: 4943042094171116878, guid: c46846da8c02e94449f5693d9563fc52, type: 3}
+      propertyPath: m_Points.m_Paths.Array.data[0].Array.data[1].y
+      value: 4.2848105
+      objectReference: {fileID: 0}
+    - target: {fileID: 4943042094171116878, guid: c46846da8c02e94449f5693d9563fc52, type: 3}
+      propertyPath: m_Points.m_Paths.Array.data[0].Array.data[2].x
+      value: -6.703782
+      objectReference: {fileID: 0}
+    - target: {fileID: 4943042094171116878, guid: c46846da8c02e94449f5693d9563fc52, type: 3}
+      propertyPath: m_Points.m_Paths.Array.data[0].Array.data[2].y
+      value: 0.89097905
+      objectReference: {fileID: 0}
+    - target: {fileID: 4943042094171116878, guid: c46846da8c02e94449f5693d9563fc52, type: 3}
+      propertyPath: m_Points.m_Paths.Array.data[0].Array.data[3].x
+      value: -6.7650585
+      objectReference: {fileID: 0}
+    - target: {fileID: 4943042094171116878, guid: c46846da8c02e94449f5693d9563fc52, type: 3}
+      propertyPath: m_Points.m_Paths.Array.data[0].Array.data[3].y
+      value: -1.8922617
+      objectReference: {fileID: 0}
+    - target: {fileID: 4943042094171116878, guid: c46846da8c02e94449f5693d9563fc52, type: 3}
+      propertyPath: m_Points.m_Paths.Array.data[0].Array.data[4].x
+      value: -7.456124
+      objectReference: {fileID: 0}
+    - target: {fileID: 4943042094171116878, guid: c46846da8c02e94449f5693d9563fc52, type: 3}
+      propertyPath: m_Points.m_Paths.Array.data[0].Array.data[4].y
+      value: -19.792982
+      objectReference: {fileID: 0}
+    - target: {fileID: 4943042094171116878, guid: c46846da8c02e94449f5693d9563fc52, type: 3}
+      propertyPath: m_Points.m_Paths.Array.data[0].Array.data[5].x
+      value: 3.342061
+      objectReference: {fileID: 0}
+    - target: {fileID: 4943042094171116878, guid: c46846da8c02e94449f5693d9563fc52, type: 3}
+      propertyPath: m_Points.m_Paths.Array.data[0].Array.data[5].y
+      value: -20.08716
+      objectReference: {fileID: 0}
+    - target: {fileID: 4943042094171116878, guid: c46846da8c02e94449f5693d9563fc52, type: 3}
+      propertyPath: m_Points.m_Paths.Array.data[0].Array.data[6].x
+      value: 4.6134095
+      objectReference: {fileID: 0}
+    - target: {fileID: 4943042094171116878, guid: c46846da8c02e94449f5693d9563fc52, type: 3}
+      propertyPath: m_Points.m_Paths.Array.data[0].Array.data[6].y
+      value: 2.7217064
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 842753845763681561, guid: c46846da8c02e94449f5693d9563fc52, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1572790908}
   m_SourcePrefab: {fileID: 100100000, guid: c46846da8c02e94449f5693d9563fc52, type: 3}
 --- !u!1 &289817789 stripped
 GameObject:
@@ -92876,6 +92937,42 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.2, y: 0.37}
   m_EdgeRadius: 0
+--- !u!1 &1572790903 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 842753845763681561, guid: c46846da8c02e94449f5693d9563fc52, type: 3}
+  m_PrefabInstance: {fileID: 289542364}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1572790908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1572790903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1237d7ffd17552f41841d6ba63844855, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prompt: Derrubar
+  landingPoint: {fileID: 0}
+  fallDistance: 3.5
+  fallDuration: 0.45
+  spin: 160
+  bounces: 2
+  bounceHeight: 0.3
+  animator: {fileID: 0}
+  fallTrigger: Fall
+  collectOnLand: 0
+  changeSortingOnLand: 1
+  landedSortingOrder: 0
+  landClip: {fileID: 0}
+  onKnockedDown:
+    m_PersistentCalls:
+      m_Calls: []
+  onLanded:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1580932469 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -2253911629886400664, guid: 3dd2c50c464100b4095993e06dcaf1c6, type: 3}
@@ -94745,7 +94842,7 @@ MonoBehaviour:
   itemId: galho
   displayName: galho
   amount: 1
-  promptOverride: 
+  promptOverride: You took a branch
   requirement:
     itemId: 
     amount: 1
@@ -94756,6 +94853,7 @@ MonoBehaviour:
     onLockedAttempt:
       m_PersistentCalls:
         m_Calls: []
+  knockDown: {fileID: 0}
   destroyOnCollect: 1
   pickupClip: {fileID: 0}
 --- !u!61 &1903294756
