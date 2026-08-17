@@ -101,7 +101,17 @@ MonoBehaviour:
   itemId: slice
   displayName: Slice of Pie
   amount: 1
-  promptOverride: You took a slice of pie!
+  promptOverride: YOU TOOK A SLICE OF PIE!
+  requirement:
+    itemId: 
+    amount: 1
+    consume: 0
+    lockedPrompt: "N\xE3o alcan\xE7o"
+    lockedMessage: 
+    lockedClip: {fileID: 0}
+    onLockedAttempt:
+      m_PersistentCalls:
+        m_Calls: []
   destroyOnCollect: 1
   pickupClip: {fileID: 8300000, guid: 17d3766ff270d2548bc530ac716c2a38, type: 3}
 --- !u!60 &4943042094171116878
