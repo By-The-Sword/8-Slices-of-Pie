@@ -65,6 +65,37 @@ não só na pausa.
 
 > O menu principal ainda não tem botões — a primeira tela é só arte.
 
+## Prompt do E
+
+`InteractPrompt` é o texto que aparece perto de um interagível — *"Pegar fatia"*, *"Entrar"*,
+*"Está trancado"*. Vai num objeto de UI dentro do Canvas com um `TextMeshProUGUI` nele ou num
+filho; acha o Player e o `PauseMenu` sozinho. Some na pausa, que é a hora do braço.
+
+Ele esconde o **texto** quando não há foco, e não o objeto: desligado, o script pararia de
+rodar e nunca veria o próximo foco chegar. O `background` opcional é a faixa escura atrás da
+legenda, pra ela ser legível em cima do cenário — liga e desliga junto com o texto.
+
+Montagem no Canvas `HUD` que já existe na cena (que é *Scale With Screen Size*, referência
+`160×144` com **Match Height**, então 1 unidade = 1 pixel do quadro):
+
+```
+HUD
+└── Prompt      ← UI > Image (a faixa) + InteractPrompt · âncora bottom-center, 150×16, Y 12
+    └── Texto   ← TextMeshProUGUI esticado no pai, PixeloidSans 8, centralizado
+```
+
+Deixe o `Prompt` **acima** de `Pause`, `Fade` e `MainMenu` na lista de irmãos: irmão mais
+embaixo desenha por cima, e essas telas têm que cobrir a legenda.
+
+`Flash("texto")` põe um recado por cima do prompt por `flashSeconds`. Recebe uma string só pra
+poder ser ligado direto num `UnityEvent` do Inspector, com o texto digitado lá.
+
+Ele já escuta o `ItemRequirement.OnAnyDenied` sozinho: **toda** tentativa em objeto trancado do
+mapa vira recado na tela, sem ligar este objeto tranca por tranca (veja *Trancas*).
+
+> Quem publica o prompt é o `PlayerInteractor.OnFocusChanged(alvo, texto)`. Ele não desenha
+> nada: dá pra ter outro ouvinte (balão em world space, fala) sem tocar no Player.
+
 ## Itens do mapa
 
 Implemente `IInteractable`. O objeto precisa de `Collider2D` com **Is Trigger**.
@@ -90,6 +121,9 @@ public class BatteryPickup : MonoBehaviour, IInteractable
 
 `Noise.Emit(pos, raio, source)` faz barulho que o Lobo escuta.
 
+Item que só pode ser pego com uma ferramenta na mão — a torta em cima da árvore, que pede o
+galho — é o `Collectible` com a seção **Tranca** preenchida; veja *Trancas*.
+
 ## Passagens
 
 `Teleporter` leva quem apertou o E pra outro canto do **mesmo** mapa — escada, bueiro,
@@ -111,6 +145,42 @@ troque um teleporte manual por este script mesmo em cutscene e respawn.
 | `onTeleported` | o que mais acontece na chegada, ligado pela cena |
 
 `Teleporter.OnAnyTeleport(quem)` é o mesmo aviso por código.
+
+## Trancas
+
+`ItemRequirement` é a seção **Tranca** que o `Collectible` e o `Teleporter` têm no Inspector:
+*"isto só funciona pra quem estiver com o galho na mão"*. Não é componente — é um campo dentro
+deles, então a porta sem chave e a torta em cima da árvore seguem a mesma regra.
+
+| Campo | Serve pra |
+|---|---|
+| `itemId` | o `itemId` do `Collectible` que destranca. **Vazio = livre** |
+| `amount` | quantas unidades ela precisa carregar |
+| `consume` | gasta o item no uso: a chave some, o galho quebra |
+| `lockedPrompt` | o prompt curto enquanto falta (*"Está trancado"*, *"Não alcanço"*) |
+| `lockedMessage` | o recado maior do canvas. Vazio repete o `lockedPrompt` |
+| `lockedClip` · `onLockedAttempt` | o som e o resto da recusa |
+
+Trancado o objeto **continua** respondendo ao E — de propósito, e é a parte que não deve ser
+"consertada". Se o `CanInteract` devolvesse false, o `PlayerInteractor` passaria por cima dele,
+o prompt sumiria, e a jogadora ficaria olhando pra uma torta muda sem pista de que existe um
+galho no mapa. Então: `CanInteract` true, e a recusa dentro do `Interact`.
+
+A recusa sai em três lugares — o `lockedClip`, o `UnityEvent onLockedAttempt` e o evento
+estático `ItemRequirement.OnAnyDenied(quem, recado)`, que o `InteractPrompt` já escuta. O texto
+na tela funciona só preenchendo os campos, sem ligar nada no Inspector.
+
+O prompt troca no quadro em que ela pega o item, sem precisar sair e voltar do raio — o
+`PlayerInteractor` compara o texto, e não só o alvo, pra decidir se republica o
+`OnFocusChanged`.
+
+Pra condição que **não** é item (alavanca, hora do relógio, NPC que ainda não falou), chame
+`SetLocked(true/false)` no `Collectible`/`Teleporter` — dá pra ligar em qualquer `UnityEvent` da
+cena. Não é serializada: a cena sempre começa destravada por esse lado.
+
+> `consume` não funciona com fatia: o `PlayerInventory.Consume` recusa o `sliceItemId` de
+> propósito (fatia é progresso, não moeda). Pra uma tranca que abre com N fatias, use
+> `itemId = slice` com o `consume` desmarcado.
 
 ## Relógio da noite
 

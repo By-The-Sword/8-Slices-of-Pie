@@ -28,6 +28,7 @@ public class PlayerInteractor : MonoBehaviour
     private PlayerController controller;
     private Rigidbody2D ownBody;
     private readonly Collider2D[] hits = new Collider2D[8];
+    private string focusedPrompt = string.Empty;
 
     private void Awake()
     {
@@ -53,12 +54,17 @@ public class PlayerInteractor : MonoBehaviour
     private void UpdateFocus()
     {
         IInteractable nearest = FindNearest();
+        string prompt = nearest != null ? nearest.Prompt : string.Empty;
 
-        if (ReferenceEquals(nearest, Focused))
+        // O texto entra na comparação, e não só o alvo: a passagem trancada troca o "Está
+        // trancado" por "Entrar" no quadro em que ela pega a chave, sem ter que dar um passo
+        // pra trás pra reavaliar o foco.
+        if (ReferenceEquals(nearest, Focused) && prompt == focusedPrompt)
             return;
 
         Focused = nearest;
-        OnFocusChanged?.Invoke(Focused, Focused != null ? Focused.Prompt : string.Empty);
+        focusedPrompt = prompt;
+        OnFocusChanged?.Invoke(Focused, prompt);
     }
 
     private IInteractable FindNearest()
