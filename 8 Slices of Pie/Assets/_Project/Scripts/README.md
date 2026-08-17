@@ -67,8 +67,12 @@ não só na pausa.
 
 ## Itens do mapa
 
-Implemente `IInteractable`. O objeto precisa de `Collider2D` com **Is Trigger**
-e da layer marcada em `interactableLayers` do `PlayerInteractor`.
+Implemente `IInteractable`. O objeto precisa de `Collider2D` com **Is Trigger**.
+
+> O `interactableLayers` do `PlayerInteractor` está em **Everything**, e todo mundo vive na
+> layer `Default` — então não há layer nenhuma pra marcar hoje. Se um dia o mapa ficar cheio
+> de collider, vale criar uma layer própria: o `OverlapCircleNonAlloc` tem buffer de 8, e
+> parede demais em volta empurra o interagível de verdade pra fora da lista.
 
 ```csharp
 public class BatteryPickup : MonoBehaviour, IInteractable
@@ -85,6 +89,28 @@ public class BatteryPickup : MonoBehaviour, IInteractable
 ```
 
 `Noise.Emit(pos, raio, source)` faz barulho que o Lobo escuta.
+
+## Passagens
+
+`Teleporter` leva quem apertou o E pra outro canto do **mesmo** mapa — escada, bueiro,
+buraco na cerca, porta que não abre cena nova. Montagem: `Collider2D` com **Is Trigger** e um
+objeto vazio na cena arrastado pro campo `destination` (sem objeto, ele usa o
+`destinationPoint` em coordenadas de mundo). O gizmo desenha a linha até o destino quando você
+seleciona a passagem.
+
+Ele não é só um `transform.position = destino`: o corpo dela anda com **Interpolate**, que
+desenharia o caminho inteiro num quadro só, e a câmera tem amortecimento, que a faria
+deslizar até o destino mostrando todo o cenário no meio. Os dois são tratados — por isso
+troque um teleporte manual por este script mesmo em cutscene e respawn.
+
+| Campo | Serve pra |
+|---|---|
+| `snapCamera` | corta o amortecimento na chegada (só quando quem viajou é o Player) |
+| `stopOnArrival` | chega parada, em vez de desembarcar correndo |
+| `singleUse` | a passagem se fecha depois de usada e o prompt some |
+| `onTeleported` | o que mais acontece na chegada, ligado pela cena |
+
+`Teleporter.OnAnyTeleport(quem)` é o mesmo aviso por código.
 
 ## Relógio da noite
 

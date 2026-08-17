@@ -134,6 +134,14 @@ public class EnemyAudio : MonoBehaviour
     private float howlTimer;
     private float grassTimer;
 
+    /// <summary>
+    /// A respiração em loop foi ligada por este script. Existe porque <c>Stop()</c> não para
+    /// só o loop: ele derruba junto todo <c>PlayOneShot</c> pendente da mesma fonte — e a
+    /// respiração costuma dividir AudioSource com as vozes. Sem esta trava, calar o Lobo
+    /// fora do mapa engolia o uivo da virada de hora, que é justamente quando ele não está lá.
+    /// </summary>
+    private bool breathing;
+
     /// <summary>Último sorteado de cada categoria — é o que impede o mesmo clipe duas vezes seguidas.</summary>
     private int lastStep = -1;
     private int lastGrowl = -1;
@@ -317,6 +325,8 @@ public class EnemyAudio : MonoBehaviour
 
         if (!breathSource.isPlaying)
             breathSource.Play();
+
+        breathing = true;
     }
 
     /// <summary>
@@ -464,10 +474,19 @@ public class EnemyAudio : MonoBehaviour
         return Mathf.Clamp(offset / panDistance, -1f, 1f) * panStrength;
     }
 
+    /// <summary>
+    /// Cala o que este script deixou tocando. Só a respiração, e só se foi ele quem a ligou:
+    /// as vozes são <c>PlayOneShot</c> e têm que terminar sozinhas. O <see cref="PlayHowl"/>
+    /// da virada de hora sai com o Lobo <b>fora</b> do mapa, ou seja, com o Update caindo aqui
+    /// todo frame — parar a fonte por precaução cortaria o uivo antes de ele virar som.
+    /// </summary>
     private void Silence()
     {
-        if (breathSource != null && breathSource.isPlaying)
+        if (breathing && breathSource != null)
+        {
+            breathing = false;
             breathSource.Stop();
+        }
 
         stepTravel = stepDistance;
         grassTimer = RandomInterval(grassInterval);
