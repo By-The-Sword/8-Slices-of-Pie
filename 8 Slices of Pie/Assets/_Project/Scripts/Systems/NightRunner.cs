@@ -11,8 +11,9 @@ using UnityEngine.SceneManagement;
 /// e recarrega a cena. Sem save no GDD, recomeçar a noite é literalmente reabrir a cena: o
 /// relógio volta pras 22:00 com 0 fatias e o <see cref="EnemyHabilities"/> reaplica o estágio 0.
 ///
-/// A oitava fatia sai por <see cref="onNightSurvived"/> em vez de recarregar nada: a casa da
-/// avó e a cutscene final ainda não existem, e este script não inventa nenhuma das duas.
+/// A oitava fatia sai por <see cref="onNightSurvived"/> em vez de recarregar nada: é por ali
+/// que a porta da casa da avó se abre e o Lobo sai do mapa. A cutscene em si é do
+/// <see cref="EndingSequence"/>, e quem a dispara é a porta — não este script.
 ///
 /// Vai no mesmo objeto de cena do <see cref="Clock"/>.
 /// </summary>
