@@ -7,6 +7,10 @@ using UnityEngine.UI;
 /// <see cref="PlayerInteractor"/> publica o prompt por evento e não desenha nada — este é o
 /// lado que desenha.
 ///
+/// Por padrão a legenda só aparece no aperto do E e some depois de meio segundo
+/// (<see cref="onlyOnInteract"/>); desligando isso ela volta a ficar na tela o tempo todo em
+/// que o objeto está em foco.
+///
 /// Vai num objeto de UI dentro de um Canvas, com o <see cref="TextMeshProUGUI"/> nele mesmo ou
 /// num filho. Some sozinho quando não há nada em foco: esconde o texto em vez de desligar o
 /// objeto, senão este script pararia de rodar junto e nunca veria o próximo foco.
@@ -30,6 +34,15 @@ public class InteractPrompt : MonoBehaviour
     [Tooltip("Vazio acha sozinho. Serve pra esconder o prompt na pausa — o braço levantado " +
              "já ocupa a tela.")]
     [SerializeField] private PauseMenu pauseMenu;
+
+    [Header("Quando aparecer")]
+    [Tooltip("Ligado: a legenda só aparece quando ela aperta o E no objeto, e some sozinha. " +
+             "Desligado: aparece o tempo todo enquanto o objeto está em foco (chegar perto basta).")]
+    [SerializeField] private bool onlyOnInteract = true;
+
+    [Tooltip("Quanto tempo a legenda fica na tela depois do E.")]
+    [Min(0.1f)]
+    [SerializeField] private float interactSeconds = 0.5f;
 
     [Header("Recado avulso")]
     [Tooltip("Quanto tempo dura um Flash() antes do prompt normal voltar.")]
@@ -63,7 +76,10 @@ public class InteractPrompt : MonoBehaviour
     private void OnEnable()
     {
         if (interactor != null)
+        {
             interactor.OnFocusChanged += HandleFocusChanged;
+            interactor.OnInteracted += HandleInteracted;
+        }
 
         ItemRequirement.OnAnyDenied += HandleDenied;
     }
@@ -71,7 +87,10 @@ public class InteractPrompt : MonoBehaviour
     private void OnDisable()
     {
         if (interactor != null)
+        {
             interactor.OnFocusChanged -= HandleFocusChanged;
+            interactor.OnInteracted -= HandleInteracted;
+        }
 
         ItemRequirement.OnAnyDenied -= HandleDenied;
     }
@@ -111,6 +130,26 @@ public class InteractPrompt : MonoBehaviour
     }
 
     /// <summary>
+    /// O E foi apertado no objeto em foco. É aqui que a legenda aparece quando o
+    /// <see cref="onlyOnInteract"/> está ligado: mostra o mesmo texto que o foco tinha no
+    /// instante do aperto — e não o de agora, porque a fatia já foi coletada e sumiu.
+    /// </summary>
+    private void HandleInteracted(IInteractable target)
+    {
+        if (!onlyOnInteract || string.IsNullOrEmpty(prompt))
+            return;
+
+        // Um recado de tranca chega antes deste evento, no mesmo aperto: deixa ele terminar em
+        // vez de cortar pra 0,5 s.
+        if (flashText != null && Time.unscaledTime < flashUntil)
+            return;
+
+        flashText = prompt;
+        flashUntil = Time.unscaledTime + interactSeconds;
+        Apply();
+    }
+
+    /// <summary>
     /// Uma tentativa recusada em qualquer objeto trancado do mapa — a torta alta demais, a
     /// porta sem chave. Vem por evento estático justamente pra não precisar arrastar este
     /// objeto pro <c>onLockedAttempt</c> de cada tranca da cena.
@@ -123,7 +162,11 @@ public class InteractPrompt : MonoBehaviour
             return;
 
         bool paused = pauseMenu != null && pauseMenu.IsPaused;
-        string text = paused ? string.Empty : flashText ?? prompt;
+
+        // Com onlyOnInteract ligado, o prompt de foco não vai pra tela sozinho: só o flash
+        // escreve — o que o E acabou de disparar, ou um recado de tranca.
+        string idle = onlyOnInteract ? string.Empty : prompt;
+        string text = paused ? string.Empty : flashText ?? idle;
 
         label.enabled = !string.IsNullOrEmpty(text);
 
