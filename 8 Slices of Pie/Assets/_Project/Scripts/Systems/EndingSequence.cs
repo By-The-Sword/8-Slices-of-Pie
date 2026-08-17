@@ -123,15 +123,13 @@ public class EndingSequence : MonoBehaviour
 
     private void Awake()
     {
+        // A fonte é sempre nossa: o MusicDirector mora neste mesmo objeto, cria as dele por
+        // AddComponent e mantém o volume delas em 0 entre as faixas. Um GetComponent pegaria
+        // uma das duas e os tiros sairiam mudos. Pra reaproveitar outra, use o campo acima.
         if (audioSource == null)
         {
-            audioSource = GetComponent<AudioSource>();
-
-            if (audioSource == null)
-            {
-                audioSource = gameObject.AddComponent<AudioSource>();
-                audioSource.playOnAwake = false;
-            }
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.playOnAwake = false;
         }
 
         // A arma toca sobre a tela preta, sem nenhum objeto de cena por perto: em 3D ela sairia
