@@ -1,557 +1,892 @@
-# 8 Slices of Pie
+# 8 Slices of Pie — Checklist de Produção
 
-**Survival horror / stealth de loop · top-down 2D · Unity 2022.3.62f3 (LTS) · pipeline 2D URP · PC (Windows)**
-Estúdio **By The Sword** · GDD **v1.5** (agosto de 2026) · 15–30 min de partida · 17 dias de produção
+**By The Sword** · Survival horror / stealth de loop · Top-down 2D · Unity 2022.3.62f3 (LTS) · 2D URP · PC (Windows)
+Espelho do **GDD v1.6** (26/08/2026) · Entrega **31/10/2026**
 
-> Chapéuzinho Vermelho precisa atravessar uma cidadezinha no meio da noite para recuperar **8 fatias de torta** antes de chegar à casa da avó. Cada fatia adianta o relógio em uma hora, e às 04:00 os moradores simplesmente não estão mais lá. O único escudo é um lampião elétrico com bateria contada.
+> Marque `- [x]` só depois do item estar **na branch principal e testado em play mode**. Arquivo importado mas não usado na cena continua desmarcado.
 
----
-
-## Como ler este checklist
-
-Este documento é o **espelho completo do GDD v1.5** em forma de tarefas. Nada foi resumido: todo item das listas de assets (seção 11), todo sistema, todo som, toda animação, todo texto e todo puzzle do documento tem uma linha aqui.
-
-| Marca | Significado |
-|---|---|
-| `- [x]` | **Pronto** — existe no repositório e está funcionando |
-| `- [ ]` 🟡 | **Parcial** — já tem base no projeto, falta terminar (o que falta está escrito na linha) |
-| `- [ ]` | **Pendente** — ainda não existe |
-
-**Regra de atualização:** só marque `[x]` depois que o item estiver **na cena/branch principal e testado em play mode**. Asset importado mas não usado continua 🟡.
-
-**Referências rápidas:** GDD §01 visão geral · §02 narrativa · §03 personagens · §04 gameplay/controles · §05 loop e progressão do Lobo · §06 mapa · §07 casas e cidade de sangue · §08 itens e textos · §09 puzzles · §10 escola · §11 produção e assets.
+**Índice:** [1 · Músicas e Áudio](#1--músicas-e-áudio) · [2 · Animações](#2--animações) · [3 · Texturas](#3--texturas) · [4 · Assets](#4--assets) · [5 · Scripts](#5--scripts)
 
 ---
 
-## Progresso por área
+# 1 · Músicas e Áudio
 
-| Área | Itens | ✅ Pronto | 🟡 Parcial | ⬜ Pendente | Progresso |
-|---|---:|---:|---:|---:|---:|
-| **1 · Funcionalidades** | 151 | 63 | 3 | 85 | 43% |
-| **2 · Mapa e level design (GDD §06)** | 22 | 0 | 4 | 18 | 9% |
-| **3 · Sprites (GDD §11 — lista de assets)** | 52 | 18 | 5 | 29 | 39% |
-| **4 · Animações (GDD §11 — lista de assets)** | 24 | 4 | 1 | 19 | 19% |
-| **5 · Sons — SFX (GDD §11 — lista de assets)** | 45 | 13 | 2 | 30 | 31% |
-| **6 · Música e trilha (GDD §11)** | 11 | 0 | 2 | 9 | 9% |
-| **7 · Textos e falas (GDD §08)** | 21 | 1 | 0 | 20 | 5% |
-| **8 · Técnico, build e otimização (GDD §11)** | 25 | 6 | 0 | 19 | 24% |
-| **TOTAL** | **351** | **105** | **17** | **229** | **32%** |
+> Composição em **FL Studio** · export **WAV 16-bit / 44.1 kHz** · mixagem separada por camada (ambiente, Lobo, UI).
 
-> Progresso conta parcial como meio item. Total de **351 itens** rastreados neste checklist.
+## 1.1 Trilha — faixas de fundo
 
----
+- [ ] Tema de abertura / menu principal (loop)
+- [ ] Faixa de fundo 1 — Ato I, a vila ainda viva (22:00–00:00)
+- [ ] Faixa de fundo 2 — Ato II, a caçada começou (01:00–03:00)
+- [ ] Faixa de fundo 3 — Ato III, a cidade de sangue (04:00–05:00)
+- [ ] Faixa de fundo 4 — Ato IV, o Lobo sumiu / falso alívio (06:00)
+- [ ] Regra do silêncio: intervalo real de silêncio entre uma faixa de fundo e outra
+- [ ] Faixas de fundo curtas o bastante para não mascarar passo e respiração do Lobo
 
-# 1 · Funcionalidades
+## 1.2 Trilha — faixas de tensão
 
-## 1.1 Player — Chapéuzinho (GDD §04)
+- [ ] Tensão 1 — o Lobo está **farejando** o rastro (SUSPEITA)
+- [ ] Tensão 2 — o Lobo está em **perseguição** (loop)
+- [ ] Tensão 3 — janela de **bote**, o pico antes do ataque
+- [ ] Stinger de entrada do Lobo no mapa (3ª fatia)
+- [ ] Stinger da **cidade de sangue** (6ª fatia)
+- [ ] Stinger da inversão da luz (7ª fatia)
+- [ ] Faixa/queda de tensão ao escapar (RECUO ou fuga bem-sucedida)
+- [ ] Crossfade entre fundo e tensão sem sobreposição audível
+- [ ] Exclusão mútua garantida: nunca duas faixas simultâneas
 
-- [x] Movimento top-down com **W A S D**, velocidade única, sem stamina e sem corrida (`PlayerController`)
-- [x] Facing travado nas direções cardeais para animação e interação
-- [x] **CTRL** alterna agachar / levantar (`PlayerController.SetCrouched`)
-- [x] Agachada: multiplicador de velocidade (0.5) e passos mais silenciosos
-- [x] Agachada o Lobo **não a percebe** — nem por proximidade nem por visão (`EnemyMov`)
-- [ ] Agachada ela **não interage com itens** (regra do GDD §04 ainda não aplicada no `PlayerInteractor`)
-- [ ] Custo de tempo da animação ao sair do agachado (hoje a troca é instantânea)
-- [x] **3 corações**, sem ataque e sem cura no mapa (`PlayerHealth`)
-- [x] Invulnerabilidade curta + knockback + flash ao levar dano (`PlayerHealth`, `PlayerHitFlash`)
-- [x] Dano variável informado por quem bate (1 coração; 2 a partir da 5ª fatia)
-- [x] Trava de controle sem desligar o componente (`MovementLocked`) para cutscene/menu
-- [x] Câmera com amortecimento seguindo a jogadora (`CameraFollow`)
-- [ ] Slot de mãos exclusivo: **lampião / escada / marreta** nunca coexistem (regra central do GDD §04 e §05)
+## 1.3 Ambiência
 
-## 1.2 Lampião e bateria (GDD §04)
+- [ ] Ambiente geral da noite (vento, grilos, madeira estalando) — loop
+- [ ] Ambiente da floresta (NO e SO)
+- [ ] Ambiente do labirinto de sebes (folhagem, som abafado)
+- [ ] Ambiente interno das casas íntegras (abafado, murmúrio de fundo)
+- [ ] Ambiente interno das casas arruinadas (vento entrando pela parede rasgada)
+- [ ] Ambiente da escola (corredor vazio, eco)
+- [ ] Ambiente da cabana do caçador (moscas, gotejar)
+- [ ] Ambiente da loja de conveniência (zumbido de lâmpada fluorescente)
+- [ ] Ambiente da casa da avó (silêncio pesado)
+- [ ] Corte de ambiência às 04:00 — a vila fica sem murmúrio nenhum
 
-- [x] **F** alterna a luz; desligado não gasta carga (`Lantern`)
-- [x] Círculo de luz por `Light2D` (Spot, Inner/Outer Angle 360)
-- [x] Bateria = 4 barras × 15 s = **60 s de luz contínua**; drena só com o lampião aceso
-- [x] Troca de bateria automática quando a carga acaba
-- [x] `Illuminates(ponto)` exposto para a IA do Lobo decidir o RECUO
-- [x] Coleta de bateria roteada pelo `PlayerInventory` direto para o `Lantern`
-- [ ] **10 baterias** distribuídas no mapa conforme GDD §08 (hoje o `Lantern` nasce com 0 reservas e o HUD desenha 4 slots)
-- [ ] Fora do círculo o mapa fica **quase preto** (Global Light 2D calibrado por hora da noite)
-- [ ] Regra da 7ª fatia: lampião aceso **emite ruído** e atrai o Lobo (ver 1.4)
-- [ ] Escada e marreta ocupam o lugar do lampião: com elas na mão, **F não acende nada**
+## 1.4 SFX — Chapéuzinho
 
-## 1.3 Lobo Mau — IA (GDD §05)
+- [ ] Passos na **grama** (2+ variações, sorteadas)
+- [ ] Passos no **ladrilho** da rua principal (2+ variações)
+- [ ] Passos no **pedregulho** das trilhas (2+ variações)
+- [ ] Passos em **piso interno** (casas, loja, escola, cabana)
+- [ ] Passos **agachada** — versão abafada e mais lenta
+- [ ] Agachar (CTRL)
+- [ ] Levantar (CTRL)
+- [ ] Respiração da Chapéuzinho (variação de esforço/medo)
+- [ ] Som de dano — perder 1 coração
+- [ ] Som de dano — perder 2 corações (a partir da 5ª fatia)
+- [ ] **Som de morte** (perder o 3º coração)
+- [ ] Grito da Chapéuzinho ao ser atingida
 
-- [x] Estado **PATRULHA** por pontos do mapa (`EnemyMov`)
-- [x] Estado **SUSPEITA** alimentado pelo canal global de ruído (`Noise.Emit` / `Noise.OnNoise`)
-- [x] Estado **PERSEGUIÇÃO** por linha de visão
-- [x] Estado **RECUO** ao entrar no círculo do lampião aceso (não morde dentro da luz)
-- [ ] 🟡 Estado **BOTE** como janela de ataque telegrafada (hoje existe a mordida do `EnemyAtk`, sem o beat de bote)
-- [ ] Estado **ATORDOADO** — 15 s, uma vez por partida, disparado pela marretada
-- [x] Mordida com alcance, cooldown e recuo pós-ataque (`EnemyAtk`)
-- [x] Nunca é derrotável — não existe combate em lugar nenhum do código
-- [x] Áudio como telegrafia: passos/respiração escalando por distância (`EnemyAudio`)
-- [x] Som de grama só com o Lobo perto e **fora do quadro**
-- [x] Spawn point próprio: entra na 3ª fatia e some na 8ª sem ser destruído
-- [ ] **Rastreamento por trilha de sangue** da 4ª fatia (hoje representado só por `senseRadius` aberto)
-- [ ] Ruído emitido pela luz acesa depois da 7ª fatia (a luz vira isca)
-- [ ] O Lobo **não invade interiores íntegros** (casas antes da 6ª, escola, cabana, loja) — mas **espera na saída**
-- [ ] O Lobo **entra nas casas arruinadas** depois da 6ª fatia (paredes rasgadas)
-- [ ] Suspeita disparada por **porta aberta**, **barricada removida** e **erro no teclado da máquina**
-- [ ] Pathfinding/navegação que não trave em sebe, parede e mobília
+## 1.5 SFX — Lampião e querosene
 
-## 1.4 Progressão do Lobo — as 8 fatias (GDD §05)
+- [ ] **Acender** o lampião (F)
+- [ ] **Apagar** o lampião (F)
+- [ ] Chama em loop enquanto aceso (baixo, contínuo)
+- [ ] Pegar **lata de querosene**
+- [ ] **Abastecer** o lampião (troca automática de lata)
+- [ ] Aviso de querosene acabando (último traço da barra)
+- [ ] Lampião apagando sozinho por falta de combustível
+- [ ] Balanço do lampião — ranger metálico da alça enquanto ela anda
 
-- [x] Tabela de estágios `WolfStage` 0–8 no Inspector, idempotente (`EnemyHabilities`)
-- [x] Cada estágio reescreve presença, `senseRadius`, `sightRadius`, `chaseSpeed`, dano e relação com a luz
-- [x] `cue` (som da hora) e `onReached` (ambientação por `UnityEvent`) por estágio
-- [ ] **1 fatia · 23:00** — uivo distante audível
-- [ ] **2 fatias · 00:00** — postes da cidade piscam brevemente *(código pronto no `StreetLamp`, falta ligar na cena)*
-- [ ] **3 fatias · 01:00** — luzes se apagam · Lobo entra no mapa · NPC da janela fala a linha A
-- [ ] **4 fatias · 02:00** — Lobo sente o cheiro do sangue (rastreamento por trilha)
-- [ ] **5 fatias · 03:00** — Lobo cria garras: dano sobe para 2 corações *(campo existe, falta preencher o estágio)*
-- [ ] **6 fatias · 04:00** — **A CIDADE DE SANGUE**: moradores somem, casas destruídas, escola destranca
-- [ ] **7 fatias · 05:00** — Lobo deixa de temer a luz e passa a ser atraído por ela
-- [ ] **8 fatias · 06:00** — Lobo desaparece do mapa e a casa da avó destranca
+## 1.6 SFX — Itens e interação
 
-## 1.5 Relógio e loop da noite (GDD §04, §05)
+- [ ] **Pegar fatia** de torta
+- [ ] **Pegar chave** (genérico, serve às 5 chaves)
+- [ ] **Chave caindo no chão** (do corpo do Lobo)
+- [ ] **Pegar moeda**
+- [ ] Pegar / abrir **papel** (carta, bilhete, lista, anotação)
+- [ ] **Pegar marreta**
+- [ ] Pegar **escada**
+- [ ] **Abrir porta**
+- [ ] **Fechar porta**
+- [ ] Porta trancada (maçaneta que não gira)
+- [ ] Recusa de tranca — "não alcanço" / "está trancado"
+- [ ] Prompt do E aparecendo (tique curto de UI)
 
-- [x] Relógio começa em **22:00** e avança 1 h por fatia, até 06:00 (`Clock`)
-- [x] Hora derivada da contagem do inventário (nunca dessincroniza)
-- [x] `OnHourChanged(hora, texto)` como gatilho único para quem reage a horário
-- [x] Contagem de fatias 0–8 e evento de vitória (`PlayerInventory.OnAllSlicesCollected`)
-- [x] Morte devolve a jogadora ao início da noite recarregando a cena (`NightRunner`)
-- [x] Fade in/out da noite e o fade de morte emendados
-- [x] Lobo congelado no instante da morte, para não rondar o corpo durante o fade
-- [ ] Verificação de que **nenhuma ordem de coleta gera deadlock** (GDD §09)
-- [ ] Guarda da fatia nº 5: coleta da **marreta bloqueada enquanto o Lobo não estiver no mapa**
-- [ ] Guarda da fatia nº 6: escola só abre com a cidade de sangue (7ª ou 8ª coletada)
+## 1.7 SFX — Puzzles
 
-## 1.6 Interação, itens e inventário (GDD §04, §08)
+- [ ] **Arrastar a escada** pelo chão (loop enquanto carrega)
+- [ ] **Encostar a escada** na árvore
+- [ ] Subir degraus da escada
+- [ ] **Queda da torta** da copa da árvore no chão
+- [ ] **Giro da marreta no vazio** (whoosh)
+- [ ] **Marretada acertando** o Lobo (impacto pesado)
+- [ ] **Marreta quebrando**
+- [ ] **Gaiola destrancando**
+- [ ] Porta de ferro da gaiola abrindo
+- [ ] **Teclado da máquina** — tecla individual
+- [ ] Máquina — código **correto** aceito
+- [ ] Máquina — **erro (bipe alto)** que chama o Lobo
+- [ ] Máquina — mola girando e **queda da fatia** na bandeja
+- [ ] Inserir a moeda na máquina
+- [ ] **Remover barricada** de mesas — 3 s de arrasto, barulho alto
+- [ ] Barricada do saguão se soltando por dentro (atalho da escola)
+- [ ] Sebes do labirinto sendo roçadas ao passar
 
-- [x] **E** contextual com prompt na tela e busca por raio (`PlayerInteractor`)
-- [x] Interface `IInteractable` para qualquer objeto do mapa
-- [x] `Collectible` genérico com `itemId`, nome de exibição, quantidade e som de coleta
-- [x] `PlayerInventory` roteando por id: bateria → lampião, fatia → contagem, resto → guardado
-- [x] `ItemRequirement` — a tranca reutilizável ("só funciona com o item X na mão"), com prompt, recado, som e `UnityEvent` de recusa
-- [x] Objeto trancado **continua respondendo ao E** (regra de design, não é bug)
-- [x] `Teleporter` para passagens internas (portas, escada, buraco), com corte de câmera e uso único opcional
-- [x] `KnockDown` — item alto que cai antes de ser catado (usado hoje na fatia da árvore)
-- [x] Emissão de ruído no uso de itens (`Noise.Emit`) alimentando a IA
-- [ ] Itens de mão que **substituem o lampião** (escada, marreta) — sistema de slot único
-- [ ] Item **carregável** que muda a movimentação (escada, GDD §09 fatia nº 4)
-- [ ] Objeto **legível** (papéis e bilhetes abrindo painel de leitura em tela)
+## 1.8 SFX — Lobo
 
-## 1.7 Os 8 puzzles das fatias (GDD §09)
+- [ ] **Uivo distante** (1ª fatia)
+- [ ] Uivo próximo (variação de proximidade)
+- [ ] **Lobo se aproximando** — passos pesados escalando por distância
+- [ ] Respiração do Lobo escalando por distância
+- [ ] Grunhido / rosnado (PATRULHA e SUSPEITA)
+- [ ] Farejar (a partir da 4ª fatia)
+- [ ] **Bote do Lobo** (o beat antes da mordida)
+- [ ] Ataque / mordida
+- [ ] **Lobo se afastando pela luz** (RECUO — até a 7ª fatia)
+- [ ] Lobo levando a marretada (hit)
+- [ ] **Lobo atordoado** — respiração arrastada, 15 s
+- [ ] Lobo se levantando do atordoamento
+- [ ] Lamento / uivo de dor
+- [ ] Som da **transformação** do Lobo (cutscene)
+- [ ] Grama sendo pisada pelo Lobo — só perto e **fora do quadro**
+- [ ] Som do Lobo entrando no mapa (3ª fatia)
+- [ ] Som do Lobo saindo do mapa (8ª fatia)
 
-- [ ] **Fatia nº 1 · banco da entrada sul (spawn)** — sem puzzle, à vista
-- [ ] **Fatia nº 2 · cruzamento central da rua** — sem puzzle, à vista
-- [ ] **Fatia nº 3 · praça do poço** — labirinto de sebes às cegas, com dois becos sem saída terminando em sangue
-- [ ] 🟡 **Fatia nº 4 · topo da árvore (floresta NO)** — trazer a **escada** da casa sudeste e encostá-la *(hoje resolvido com um `galho` + `KnockDown`; ver §9 Divergências)*
-- [ ] **Fatia nº 5 · gaiola da cabana** — chave da cabana no mato → marreta → marretada no Lobo → chave da gaiola cai no ponto do golpe → gaiola abre
-- [ ] **Fatia nº 6 · armário da escola** — cadeia de três chaves e três barricadas
-- [ ] 🟡 **Fatia nº 7 · máquina da loja** — moeda **+ código** da folha de estoque *(moeda e máquina já entraram; falta o teclado, o código e o bipe de erro)*
-- [ ] **Fatia nº 8 · floresta sudoeste** — seguir a dica do NPC da janela acesa por legenda
-- [ ] Prefab da fatia com feedback de coleta, som e efeito de progresso (base em `SliceOfPie.prefab`)
+## 1.9 SFX — Mundo e eventos da noite
 
-## 1.8 Casas, moradores e a cidade de sangue (GDD §07)
+- [ ] **Postes piscando** (2ª fatia)
+- [ ] Blecaute — as luzes da cidade se apagando (3ª fatia)
+- [ ] **Postes reacendendo em vermelho** (6ª fatia) — zumbido diferente do original
+- [ ] Zumbido contínuo dos postes acesos
+- [ ] Troca das casas para o estado destruído (som fora da tela)
+- [ ] **Rádio com chiado** (casa sul)
+- [ ] Escola destrancando (6ª fatia)
+- [ ] Casa da avó destrancando (8ª fatia)
+- [ ] **Grito do NPC da janela** (ao pegar a fatia nº 8)
+- [ ] Vidro da janela do NPC quebrando
+- [ ] Água do poço (praça central)
+- [ ] Marcação de hora do relógio a cada fatia coletada
 
-- [ ] **6 casas entráveis**, uma sala cada, abrindo com E
-- [ ] **10 moradores** distribuídos (1 a 3 por casa), sem seguir e sem reagir a nada
-- [ ] Regra "**um por casa fala**": só o morador mais próximo da porta, uma única vez
-- [ ] Fala única de cada casa disparada na entrada (6 falas — ver §7 Textos)
-- [ ] Objetos dentro das casas nos lugares certos: 4 baterias, escada, bilhete do vizinho, bilhete da professora
-- [ ] Enquanto íntegra, a casa é **abrigo**: o Lobo não entra
-- [ ] O Lobo **continua se movendo** enquanto ela está dentro (a saída é sempre uma aposta cega)
-- [ ] **Evento da 6ª fatia**: os 6 moradores somem sem corpo e sem explicação
-- [ ] Troca de estado da casa para **arruinada** (porta arrancada, parede rasgada, móveis virados, sangue), sempre **fora da tela**
-- [ ] Casa arruinada deixa de proteger: o Lobo entra e sai por onde quiser
-- [ ] Os **objetos permanecem** nos escombros (quem deixou recurso para trás pode voltar)
-- [ ] **Casa do NPC** (7ª casa, trilha leste): nunca entrável, nunca renderizada por dentro, só a janela acesa
-- [ ] Exceção da casa do NPC: ela **só cai depois** que a jogadora pega a fatia nº 8
+## 1.10 SFX — Falas, legendas e UI
 
-## 1.9 A escola (GDD §10)
+- [ ] **Falas dos moradores** — murmúrio (6 variações, uma por casa)
+- [ ] Murmúrio de ambientação dos moradores que não falam
+- [ ] Fala do NPC da janela — linha A (3ª fatia)
+- [ ] Fala do NPC da janela — linha B (6ª fatia)
+- [ ] **Som de caractere da legenda** (typewriter)
+- [ ] Hover do mouse nos botões
+- [ ] Clique dos botões
+- [ ] **Press Start** da primeira tela
+- [ ] Abrir pausa (ESC) — braço subindo
+- [ ] Fechar pausa (ESC) — braço descendo
+- [ ] Navegação de opções (volume, idioma)
+- [ ] Som de saída / quit
 
-- [ ] Escola **trancada e barricada a noite inteira**, destrancando só na cidade de sangue
-- [ ] **1 · Saguão** com duas saídas: corredor oeste aberto e corredor leste com barricada fixa
-- [ ] **2 · Sala de aula** — bilhete do aluno + chave da secretaria, carteiras viradas e desenhos nas paredes
-- [ ] **3 · Secretaria** — planta da escola na parede (único mapa de interior do jogo), lista de chamada + chave do refeitório
-- [ ] **4 · Refeitório** — barricada de mesas removível com E: **3 segundos e barulho alto**
-- [ ] **5 · Corredor leste** — armário trancado à vista desde a entrada
-- [ ] **6 · Sala dos professores** — chave do armário + última anotação
-- [ ] **7 · Armário → FATIA Nº 6**, e a porta barricada do saguão se solta por dentro virando atalho de saída
-- [ ] Nenhuma chave abre mais de uma porta (3 chaves, 3 barricadas)
-- [ ] O Lobo não entra, mas **espera na porta** — sem indicação de qual lado
-- [ ] Escola percorrida **só com o lampião** como fonte de luz
+## 1.11 SFX — Cutscene final
 
-## 1.10 NPC da janela, falas e legendas (GDD §03)
+- [ ] Cesta caindo no chão
+- [ ] Fatias sendo montadas sobre a mesa
+- [ ] O corpo se levantando da cama
+- [ ] Destransformação — pelo virando pele
+- [ ] **Arma sendo carregada**
+- [ ] **Tiro**
+- [ ] Corte para preto — silêncio absoluto
+- [ ] Relógio travando em 06:00
+- [ ] Música dos créditos
 
-- [ ] Sistema de **legenda narrativa** (diferente do prompt de interação já existente)
-- [ ] Fila de falas com tempo de leitura, som de caractere e corte na pausa
-- [ ] **Linha A · 3ª fatia**: disparada quando as luzes se apagam, indicando a fatia nº 8
-- [ ] **Linha B · 6ª fatia**: só existe se a fatia nº 8 ainda não foi pega; substitui a linha A
-- [ ] **Grito** no instante em que a fatia nº 8 é coletada
-- [ ] Ao voltar: luz apagada, janela quebrada, casa arruinada — o NPC não fala mais
-- [ ] Janela acesa como único "corpo" do NPC (referência Bloodborne), nunca renderizado
-- [ ] Falas dos moradores na entrada de cada casa (6 falas únicas)
+## 1.12 Mixagem e especificação técnica
 
-## 1.11 HUD, menus e opções (GDD §04)
-
-- [x] **HUD diegética do braço**: sobe com a pausa, desce ao voltar (`ArmHUD`)
-- [x] Relógio, pulseira de corações e baterias amarradas, redesenhando por evento
-- [x] **ESC** abre/fecha o menu, braço na direita e botões na esquerda (`PauseMenu`)
-- [x] Botões de pausa: Continue, Options, Main Menu, Quit, ligados por `OnClick`
-- [x] `UIFadeIn` — botões entram em fade e não aceitam clique enquanto aparecem
-- [x] `InteractPrompt` — "Pegar fatia", "Entrar", "Está trancado", com faixa escura de leitura
-- [x] `InteractPrompt` escuta `ItemRequirement.OnAnyDenied` sozinho (recusa vira recado na tela)
-- [x] Sons de interface: hover, clique, pause in/out, press start (`UISounds`)
-- [x] Cena de **Main Menu** separada
-- [ ] **Botões do menu principal** (hoje a primeira tela é só arte)
-- [ ] Painel de **Options** com conteúdo: volume por camada (ambiente / Lobo / UI), brilho e idioma
-- [ ] Tela/estado de **derrota** ("a noite te pegou") ligada no `NightRunner.onDeath`
-- [ ] **Créditos** ao fim da cutscene
-- [ ] Tela de controles / tutorial silencioso do Ato I
-
-## 1.12 Cutscene final, morte e reinício (GDD §02)
-
-- [x] `EndingSequence` com palco, ator único e troca de sprite Lobo → caçador
-- [x] Input travado durante toda a sequência
-- [x] Corte para preto, som de arma sendo carregada e tiro
-- [x] Disparo pela porta da casa da avó via `Teleporter.onTeleported`
-- [ ] **Beat 1**: Chapéuzinho entra e monta a torta sobre a mesa com as 8 fatias
-- [ ] **Beat 2**: a "avó" se levanta, a cesta cai, corte para o quarto — restos, sangue e a touca da avó no chão
-- [ ] **Beat 3**: o Lobo avança, se contorce e se destransforma no caçador
-- [ ] **Beat 4**: ele olha as próprias mãos e encontra o papel "não sou eu" · corte para preto · tiro
-- [ ] **Beat 5**: tela preta, relógio marcando **06:00 travado**, créditos
-- [ ] Casa da avó **selada até 8/8** — a única transição irreversível do jogo
-
-## 1.13 Localização (GDD §01)
-
-- [ ] Sistema de idioma **PT-BR / Inglês** (legendas)
-- [ ] Tabela de strings externa (prompts, falas, textos, menu, créditos)
-- [ ] Seletor de idioma no menu de opções
-- [ ] Revisão da tradução dos 7 textos e das 8 falas
-
-## 1.14 Áudio — sistemas (GDD §11)
-
-- [x] `MusicDirector` — faixa de fundo e faixa de tensão, **nunca simultâneas**, com crossfade
-- [x] Silêncio real entre faixas (música é evento, não fundo permanente)
-- [x] Troca automática para tensão quando o Lobo fareja ou persegue
-- [x] `PlayerFootsteps` com clipes sorteados, ritmo e volume reduzido no agachado
-- [x] `EnemyAudio` com escala por distância
-- [x] Canal global de ruído `Noise` conectando som e IA
-- [ ] **Mixagem separada por camada**: ambiente · Lobo · UI (AudioMixer com grupos e volume exposto)
-- [ ] Ducking da trilha durante falas e sustos
-- [ ] Ajuste de áudio na fase de otimização (GDD §11)
+- [ ] Todos os arquivos exportados em **WAV 16-bit / 44.1 kHz**
+- [ ] Camada de mixagem **Ambiente** (grupo próprio no AudioMixer)
+- [ ] Camada de mixagem **Lobo** (grupo próprio, prioridade de leitura)
+- [ ] Camada de mixagem **UI** (grupo próprio, imune ao `timeScale = 0`)
+- [ ] Camada de mixagem **Música**
+- [ ] Camada de mixagem **Player / SFX**
+- [ ] Ducking da música quando o Lobo está perto
+- [ ] Áudio espacializado (2D vs 3D) definido item por item
+- [ ] Rolloff de distância calibrado para os passos do Lobo
+- [ ] Controle de volume por camada no menu de opções
+- [ ] Nenhum clipe estourando (headroom de -3 dB no master)
 
 ---
 
-# 2 · Mapa e level design (GDD §06)
+# 2 · Animações
 
-- [ ] 🟡 **Rua principal retilínea de ladrilho**, norte–sul, cortando o mapa *(tilesets importados, cidade não montada)*
-- [ ] Trilhas de pedregulho ligando cada fachada (estilo Saint Denis)
-- [ ] Todo o resto do solo em **grama**, igual ao da floresta — sem calçada, apagando a fronteira vila/mata
-- [ ] **A–G**: os sete locais da planta posicionados conforme a arte do GDD
-- [ ] **6 casas entráveis** com interior próprio
-- [ ] **Casa do NPC** (não entrável) na trilha leste
-- [ ] **Praça do poço** com o poço no centro
-- [ ] **Labirinto de sebes** ao redor do poço, com sebes altas bloqueando linha de visão
-- [ ] Corredor do labirinto **mais largo que o círculo do lampião**
-- [ ] Dois becos sem saída do labirinto terminando em sangue
-- [ ] 🟡 **Escola** — o maior interior do jogo, 6 ambientes *(objeto `EscolaInterior` já existe na cena)*
-- [ ] 🟡 **Cabana do caçador** — casa pequena de pescador, a mais distante *(objeto `CabanaInterior` já existe na cena)*
-- [ ] Cabana com rasgos nas paredes, carne humana e sangue **desde o início da partida**
-- [ ] Gaiola de ferro no meio da sala da cabana + marreta encostada na parede
-- [ ] **Loja de conveniência** — luzes acesas a noite toda e completamente vazia
-- [ ] 🟡 **Casa da avó** no fim da rua principal *(objeto `CasaVovó` já existe na cena)*
-- [ ] **Floresta** ao redor, com a árvore alta a noroeste
-- [ ] Posicionamento das **8 fatias** nos locais do GDD §09
-- [ ] Distribuição das **10 baterias**: 4 nas casas · 1 na cabana · 1 na loja · 1 na escola · 1 no labirinto · 2 ao ar livre
-- [ ] Postes de luz distribuídos pela rua, com um `StreetLamp` em cada
-- [ ] Ponto de spawn com a carta da mãe e a fatia nº 1
-- [ ] Colisão do mapa inteiro revisada (nenhum canto onde o Lobo trava ou ela escapa)
+## 2.1 Chapéuzinho — em pé
+
+- [ ] Idle — 4 direções (baixo, cima, lado com flip)
+- [ ] Idle — diagonais (cima-lado, baixo-lado)
+- [ ] **Caminhada — baixo**
+- [ ] **Caminhada — cima**
+- [ ] **Caminhada — lado**
+- [ ] **Caminhada — diagonal baixo-lado**
+- [ ] **Caminhada — diagonal cima-lado**
+- [ ] Animação de dano / hit flash
+- [ ] Animação de morte
+
+## 2.2 Chapéuzinho — agachada
+
+- [ ] **Agachar** (transição em pé → agachada, com custo de tempo)
+- [ ] **Levantar** (transição agachada → em pé, com custo de tempo)
+- [ ] CrouchIdle — 4 direções
+- [ ] CrouchWalk — 4 direções
+- [ ] CrouchIdle / CrouchWalk — diagonais
+
+## 2.3 Chapéuzinho — mãos ocupadas
+
+- [ ] **Balanço do lampião na mão** (física — atrasa nas mudanças de direção)
+- [ ] Oscilação do círculo de luz acompanhando o lampião
+- [ ] Acender / apagar a chama
+- [ ] Chama do lampião em loop (idle da luz)
+- [ ] **Carregar a escada** — idle e caminhada (silhueta própria)
+- [ ] **Encostar a escada** na árvore
+- [ ] **Subir a escada**
+- [ ] Descer a escada
+- [ ] **Carregar a marreta** — idle e caminhada
+- [ ] **Giro da marreta** (trava o movimento pela duração)
+- [ ] **Marreta quebrando** no impacto
+- [ ] **Troca de lampião por marreta** (o lampião sai da mão sozinho)
+- [ ] Troca de marreta por lampião (a luz volta após o acerto)
+- [ ] Abastecer o lampião com a lata
+
+## 2.4 Lobo Mau
+
+- [ ] Idle (forma normal)
+- [ ] Caminhada / patrulha
+- [ ] **Corrida do Lobo** (perseguição)
+- [ ] **Farejar** (a partir da 4ª fatia)
+- [ ] **Bote** — a janela de ataque telegrafada
+- [ ] **Ataque** / mordida
+- [ ] **Recuo** ao entrar no círculo do lampião
+- [ ] **Atordoado** — 15 s no chão
+- [ ] **Se levantando** do atordoamento
+- [ ] Hit / levar a marretada
+- [ ] Surgindo no mapa (3ª fatia)
+- [ ] Desaparecendo do mapa (8ª fatia)
+- [ ] Garras aparecendo (5ª fatia — variação visual)
+
+## 2.5 Lobo — forma transformada / vovó
+
+- [ ] Idle do Lobo vestido de vovó (4 frames, na cama)
+- [ ] Levantar-se da cama
+- [ ] Caminhada da forma transformada
+- [ ] Ataque da forma transformada
+- [ ] Idle do caçador em forma humana (4 frames)
+- [ ] **Destransformação** — Lobo → caçador
+- [ ] Caçador olhando as próprias mãos
+
+## 2.6 Moradores e NPC
+
+- [ ] Idle dos moradores — sentado
+- [ ] Idle dos moradores — de costas
+- [ ] Idle dos moradores — olhando pela janela
+- [ ] Idle da mãe com criança de colo
+- [ ] Fala única do morador mais próximo da porta
+- [ ] Idle indiferente: nenhum morador reage ao Lobo, ao lampião ou às fatias
+- [ ] Desaparecimento dos moradores na 6ª fatia (troca fora da tela)
+
+## 2.7 Objetos e puzzles
+
+- [ ] **Chave caindo do corpo do Lobo** no ponto do golpe
+- [ ] Chave quicando no chão
+- [ ] **Gaiola abrindo**
+- [ ] **Queda da fatia na máquina** (mola girando + tombo na bandeja)
+- [ ] Teclado da máquina — feedback de tecla
+- [ ] Máquina — animação de erro (bipe + luz)
+- [ ] Remoção da barricada de mesas (3 s)
+- [ ] Barricada do saguão se soltando pelo lado de dentro
+- [ ] Portas abrindo e fechando
+- [ ] Fatia de torta — idle no chão
+- [ ] Lata de querosene — idle
+- [ ] Papéis abrindo em tela cheia (leitura)
+
+## 2.8 Mundo e eventos da noite
+
+- [ ] **Postes piscando** (2ª fatia) — com jitter por poste
+- [ ] Postes se apagando (3ª fatia)
+- [ ] **Postes reacendendo em vermelho** (6ª fatia)
+- [ ] **Sebes ao vento** (labirinto)
+- [ ] Árvores da floresta ao vento
+- [ ] Grama ao vento
+- [ ] Janela acesa do NPC — luz oscilando
+- [ ] Janela do NPC apagando e quebrando (após a fatia nº 8)
+- [ ] **Troca das casas para o estado destruído** (6ª fatia — instantânea, fora da tela)
+- [ ] Sangue escorrendo / poças (cidade de sangue)
+- [ ] Água do poço
+
+## 2.9 Cutscene final
+
+- [ ] **Cutscene final completa**, beat a beat, sem input
+- [ ] Beat 1 — Chapéuzinho entra e monta a torta sobre a mesa
+- [ ] Beat 2 — a "avó" se levanta; a cesta cai
+- [ ] Beat 2b — corte para o quarto: restos, sangue, a touca da avó no chão
+- [ ] Beat 3 — o Lobo avança, se contorce e se destransforma
+- [ ] Beat 4 — o caçador olha as mãos e encontra o papel "não sou eu"
+- [ ] Beat 4b — corte para preto + som de tiro
+- [ ] Beat 5 — relógio marca 06:00 e trava
+- [ ] Beat 5b — créditos sobem
+
+## 2.10 UI e HUD
+
+- [ ] Braço diegético subindo (abrir pausa)
+- [ ] Braço diegético descendo (fechar pausa)
+- [ ] Fade-in dos botões de pausa (`UIFadeIn`)
+- [ ] Fade in/out da noite (início de partida)
+- [ ] Fade de morte
+- [ ] Transição entre menu principal e jogo
+- [ ] Legenda entrando caractere a caractere
+- [ ] Prompt do E aparecendo / sumindo
+- [ ] Ponteiro do relógio avançando a cada fatia
+- [ ] Coração se apagando na pulseira
+- [ ] Traço de querosene sumindo da barra
+
+## 2.11 Setup de Animator
+
+- [ ] `Sprite.controller` — 4 estados (Idle, Walk, CrouchIdle, CrouchWalk)
+- [ ] Cada estado como **Blend Tree 2D Simple Directional** em `(0,-1) (0,1) (-1,0) (1,0)`
+- [ ] Parâmetros `MoveX`, `MoveY` (Float) e `IsMoving`, `IsCrouched` (Bool) com os nomes batendo com o `PlayerAnimatorBridge`
+- [ ] Transições por `Any State`, `Has Exit Time` desmarcado, duração 0
+- [ ] **`Can Transition To Self` desmarcado** em todas as transições
+- [ ] `Wolf.controller` — Idle, Walk, Run, Attack, Sniff, Recoil, Stun
+- [ ] `WolfTransformed.controller` — Idle, Walk, Attack
+- [ ] Controller de mãos ocupadas (lampião / escada / marreta)
+- [ ] Controller dos moradores
+- [ ] Controller dos postes (aceso / piscando / apagado / vermelho)
+- [ ] Todos os clipes com `Loop Time` correto (idle e walk sim, transições não)
+- [ ] Sample rate de todos os clipes padronizado
+- [ ] Animation Events sincronizando os SFX (passo, marretada, quebra)
 
 ---
 
-# 3 · Sprites (GDD §11 — lista de assets)
+# 3 · Texturas
 
-**Padrão:** pixel art **acima do 8-bit**, mais cores por sprite e mais detalhe por tile, densidade do mock de menu como referência. Escala por número inteiro, *nearest neighbor*, sem filtro.
+> Pixel art densa acima do padrão 8-bit · paleta noturna · resolução interna escalada por inteiro (**nearest neighbor**) · **pixels per unit fixo** em todo o projeto · sem filtro nem suavização.
 
 ## 3.1 Personagens
 
-- [x] **Chapéuzinho de pé** — idle + corrida em 5 folhas direcionais
-- [ ] **Chapéuzinho agachada** (idle e andando)
-- [ ] Chapéuzinho carregando escada
-- [ ] Chapéuzinho carregando marreta
-- [x] **Lobo Mau** — idle, caminhada e ataque (forma normal)
-- [x] **Lobo transformado** — idle, caminhada e ataque (forma de garras / 5ª fatia)
-- [x] **Lobo vestido de vovó** (cutscene)
-- [x] **Caçador** — idle (cutscene)
-- [ ] Caçador em **forma humana** fora da cama (se a cutscene pedir um segundo conjunto de poses)
-- [ ] **Lobo atordoado** (caído e se levantando)
+- [ ] **Chapéuzinho — em pé**: idle 8 direções
+- [ ] **Chapéuzinho — em pé**: walk sheet 8 direções
+- [ ] **Chapéuzinho — agachada**: idle 8 direções
+- [ ] **Chapéuzinho — agachada**: walk sheet 8 direções
+- [ ] Chapéuzinho segurando o **lampião**
+- [ ] Chapéuzinho carregando a **escada**
+- [ ] Chapéuzinho carregando a **marreta**
+- [ ] Chapéuzinho — frames de dano e morte
+- [ ] **Lobo Mau** — idle sheet
+- [ ] **Lobo Mau** — walk / run sheet
+- [ ] **Lobo Mau** — attack sheet
+- [ ] **Lobo Mau** — sniff / farejar sheet
+- [ ] **Lobo Mau** — recuo sheet
+- [ ] **Lobo atordoado** — frames no chão + levantar
+- [ ] Lobo com garras (variação da 5ª fatia)
+- [ ] **Lobo vestido de vovó** — idle sheet (4 frames)
+- [ ] Lobo vestido de vovó — levantar da cama e avançar
+- [ ] **Caçador vestido de vovó** (estado intermediário da destransformação)
+- [ ] **Caçador — forma humana** idle sheet (4 frames)
+- [ ] Caçador olhando as mãos
 - [ ] **10 moradores** — sprites reaproveitáveis com troca de paleta
-- [x] **Vovó** (sprite de cena/cutscene)
+- [ ] Morador — mãe
+- [ ] Morador — criança de colo
+- [ ] Morador — filho mais velho
+- [ ] Morador — homem velho quase surdo
+- [ ] Morador — professora
+- [ ] Morador — marido da professora
+- [ ] Morador — pescador
+- [ ] Morador — casal idoso (2 sprites)
+- [ ] Morador — rapaz do rádio
+- [ ] Paletas alternativas dos moradores (para repetir sprite entre casas)
+- [ ] Avó — touca no chão e restos no quarto (cutscene)
 
-## 3.2 Cenário e tilesets
+## 3.2 Tilesets da cidade
 
-- [ ] 🟡 **Tileset da cidade** — grama, ladrilho, pedregulho, fachadas *(há `tileBaseTileset` importado; falta o set completo do GDD)*
-- [ ] 🟡 **Interiores das casas — estado íntegro** *(há `TopDownHouse_FloorsAndWalls` + `FurnitureState1`)*
-- [ ] **Interiores das casas — estado destruído** (parede rasgada, móveis virados, poças e respingos)
-- [ ] **Sebes do labirinto**
+- [ ] Tileset de **grama** (terreno padrão, o mesmo da floresta)
+- [ ] Tileset de **ladrilho** — a rua principal norte-sul
+- [ ] Tileset de **pedregulho** — trilhas estilo Saint Denis
+- [ ] Autotile / regras de transição entre grama, ladrilho e pedregulho
+- [ ] Tileset de **fachadas** das casas
+- [ ] Tileset de telhados
+- [ ] Tileset de cercas e muros
+- [ ] Tileset de piso interno (madeira, azulejo)
+- [ ] Tileset de paredes internas
+- [ ] Tileset de **paredes rasgadas** (estado destruído)
+- [ ] Tileset da escola (piso e parede institucional)
+- [ ] Tileset da floresta (chão de mata, folhas)
+- [ ] Colisores de todos os tilemaps configurados
+
+## 3.3 Cenário — exteriores
+
+- [ ] **Sebes do labirinto** (altas, bloqueiam linha de visão)
+- [ ] Cantos e pontas das sebes
+- [ ] Becos sem saída com sangue (2 no labirinto)
 - [ ] **Poço da vila**
-- [ ] **Escola completa**: saguão, corredores, sala de aula, secretaria, refeitório, sala dos professores, armário
-- [ ] **Barricadas** (a fixa, a de mesas removível e a que se solta por dentro)
-- [ ] 🟡 **Floresta e árvore** *(`arvore 1`, `arvore2` importadas)*
-- [ ] **Cabana** do caçador (exterior e interior)
-- [ ] **Loja de conveniência** (exterior e interior)
-- [ ] **Poças e respingos de sangue** (ruas, paredes e teto)
-- [ ] Janela acesa do NPC (acesa, quebrada e apagada)
-- [ ] 🟡 **Fachadas das casas** — `house1`, `house2`, `house3` importadas; faltam as 7 casas distintas do GDD
-- [x] **Postes de luz** (`poste1`) e luminária
-- [x] **Armário** (peça de cenário)
+- [ ] **Árvores da floresta** (variações)
+- [ ] **A árvore da fatia nº 4** (com ponto de encosto da escada)
+- [ ] Arbustos e mato
+- [ ] Mato dos fundos da cabana (onde está a chave)
+- [ ] **Postes** — apagado
+- [ ] **Postes** — aceso (amarelo)
+- [ ] **Postes** — piscando
+- [ ] **Postes** — **vermelho** (cidade de sangue)
+- [ ] Luminária / lampião de rua
+- [ ] Banco da entrada sul (spawn, fatia nº 1)
+- [ ] Cruzamento central da rua (fatia nº 2)
+- [ ] Placas e detalhes de rua
+- [ ] Janela acesa do NPC (amarela)
+- [ ] Janela do NPC quebrada e apagada
 
-## 3.3 Itens e props
+## 3.4 Cenário — casas dos moradores
 
-- [x] **Fatia de torta**
-- [x] **Moeda**
-- [x] **Chave** (base dourada — replicar para chave da cabana, da gaiola e as 3 da escola)
-- [x] **Papéis / bilhetes** (`folha`, `folha caçador`)
-- [x] **Máquina com teclado** (máquina de snacks)
-- [ ] **Lampião elétrico** (na mão, aceso e apagado)
-- [ ] **Bateria** (item no chão — o prefab existe, a arte não)
-- [ ] **Escada** (parada, carregada e encostada na árvore)
-- [ ] **Marreta** (inteira e quebrada)
-- [ ] **Gaiola de ferro** (fechada e aberta)
-- [ ] Rádio ligado (casa sul)
-- [ ] Cesta da Chapéuzinho (cutscene)
-- [ ] Touca da avó no chão (cutscene)
-- [ ] 🟡 **Galho** *(item da solução atual da árvore; ver §9 Divergências)*
+- [ ] Fachada da casa **noroeste** — íntegra e destruída
+- [ ] Fachada da casa **nordeste** — íntegra e destruída
+- [ ] Fachada da casa **oeste** — íntegra e destruída
+- [ ] Fachada da casa **sudeste** — íntegra e destruída
+- [ ] Fachada da casa **sudoeste** — íntegra e destruída
+- [ ] Fachada da casa **sul** — íntegra e destruída
+- [ ] Fachada da **casa do NPC** (nunca entrável)
+- [ ] Casa do NPC em ruínas (só após a fatia nº 8)
+- [ ] **Interior íntegro** — 6 variações de sala (uma por casa)
+- [ ] **Interior destruído** — 6 variações (porta arrancada, parede rasgada, móveis virados)
+- [ ] Móveis: cama, mesa, cadeira, armário, estante, fogão
+- [ ] Móveis virados / quebrados
+- [ ] Rádio ligado (casa sul) + segunda cadeira vazia
+- [ ] Portas — fechada, aberta, arrancada
 
-## 3.4 UI e ícones
+## 3.5 Cenário — escola
 
-- [x] Arte do **menu principal** + lobo do menu
-- [x] Botão base da interface
-- [x] **Braço da HUD**, relógio, pulseira e baterias
-- [x] Sprite do relógio das 22:00 (quadro separado, `clock22`)
-- [x] Fontes pixel (Pixeloid Mono / Sans / Sans Bold) com SDF gerado
-- [ ] Folha completa do **relógio 23:00 → 06:00** (8 quadros)
-- [ ] Folha da **pulseira** 3 → 1 coração (3 quadros)
-- [ ] Folha das **baterias** 4 → 0 reservas (5 quadros) — revisar para as 10 baterias do GDD
-- [ ] Ícone/arte da tela de derrota
-- [ ] Arte dos créditos
-- [ ] Painel de leitura de papéis e bilhetes
+- [ ] **Saguão de entrada**
+- [ ] **Corredor oeste**
+- [ ] **Corredor leste**
+- [ ] **Sala de aula** (carteiras viradas, desenhos nas paredes)
+- [ ] **Secretaria**
+- [ ] **Refeitório** (mesas)
+- [ ] **Sala dos professores**
+- [ ] **Armário** trancado (fatia nº 6)
+- [ ] Fachada externa da escola — trancada
+- [ ] Fachada externa da escola — destrancada (6ª fatia)
+- [ ] **Barricada fixa** do corredor leste
+- [ ] **Barricada removível** de mesas (refeitório)
+- [ ] Barricada do saguão — solta pelo lado de dentro
+- [ ] **Planta da escola** afixada na parede (único mapa de interior do jogo)
+- [ ] Desenhos de criança nas paredes
+- [ ] Quadro-negro
 
----
+## 3.6 Cenário — cabana, loja e casa da avó
 
-# 4 · Animações (GDD §11 — lista de assets)
+- [ ] **Cabana do caçador** — exterior
+- [ ] Cabana — interior com rasgos nas paredes
+- [ ] Carne humana e sangue nos cômodos da cabana
+- [ ] **Gaiola de ferro — fechada**
+- [ ] **Gaiola de ferro — aberta**
+- [ ] **Marreta — inteira**
+- [ ] **Marreta — quebrada**
+- [ ] **Loja de conveniência** — exterior (luzes sempre acesas)
+- [ ] Loja — interior (balcão, prateleiras, vazia)
+- [ ] **Máquina de snacks com teclado**
+- [ ] Máquina — display do código
+- [ ] Máquina — estado de erro
+- [ ] **Casa da avó** — exterior selado
+- [ ] Casa da avó — exterior destrancado (8/8)
+- [ ] Casa da avó — sala com a mesa da torta
+- [ ] Casa da avó — quarto: restos, sangue, touca no chão
 
-- [x] **Caminhada da Chapéuzinho** (4 direções + diagonais, em Blend Tree 2D Simple Directional)
-- [x] Idle da Chapéuzinho
-- [ ] **Agachar e levantar** (estados `CrouchIdle` e `CrouchWalk` já esperados pelo `PlayerAnimatorBridge`)
-- [ ] **Carregar escada**
-- [ ] **Encostar escada e subir**
-- [ ] **Carregar marreta**
-- [ ] **Giro da marreta**
-- [ ] **Marreta quebrando**
-- [ ] **Troca de lampião por marreta**
-- [x] **Corrida do Lobo** (walk) — formas normal e transformada
-- [x] Idle e **ataque** do Lobo — formas normal e transformada
-- [ ] **Farejar** do Lobo (4ª fatia)
-- [ ] **Recuo** do Lobo (fuga da luz)
-- [ ] **Bote** do Lobo (janela de ataque telegrafada)
-- [ ] **Lobo atordoado e se levantando**
-- [ ] **Chave caindo do corpo do Lobo**
-- [ ] **Gaiola abrindo**
-- [ ] **Queda da fatia na máquina**
-- [ ] 🟡 **Postes piscando** *(feito por `Light2D` no `StreetLamp`; falta a animação de sprite, se houver)*
-- [ ] **Sebes ao vento**
-- [ ] **Troca das casas para o estado destruído**
-- [ ] **Cutscene final completa** (os 5 beats de §1.12)
-- [ ] Transição do Lobo → caçador (destransformação)
-- [ ] Animação de dano e de morte da Chapéuzinho
+## 3.7 Itens
 
----
+- [ ] **Fatia de torta** (sprite do coletável)
+- [ ] Torta montada sobre a mesa (8 fatias — cutscene)
+- [ ] Cesta da Chapéuzinho
+- [ ] **Lampião de querosene** — apagado
+- [ ] **Lampião de querosene** — aceso (com chama animada)
+- [ ] **Lata de querosene**
+- [ ] **Escada**
+- [ ] **Chave da cabana**
+- [ ] **Chave da gaiola**
+- [ ] **Chave da secretaria**
+- [ ] **Chave do refeitório**
+- [ ] **Chave do armário**
+- [ ] **Moeda**
+- [ ] **Folha de estoque**
+- [ ] **Carta da mãe**
+- [ ] **Bilhete do vizinho**
+- [ ] **Bilhete da professora**
+- [ ] **Bilhete do aluno**
+- [ ] **Lista de chamada**
+- [ ] **Última anotação**
+- [ ] **Papel da cabana** ("não sou eu" repetido)
+- [ ] Textura de fundo para leitura de papel em tela cheia
+- [ ] Arma do caçador (cutscene final)
 
-# 5 · Sons — SFX (GDD §11 — lista de assets)
+## 3.8 Sangue e cidade de sangue
 
-**Especificação:** composição em **FL Studio**, exportação em **WAV 16-bit / 44.1 kHz**.
+- [ ] **Poças de sangue** (variações)
+- [ ] **Respingos de sangue** em parede
+- [ ] Respingos de sangue no **teto**
+- [ ] Sangue no chão de terra / grama
+- [ ] Trilha de sangue da Chapéuzinho (rastro da 4ª fatia)
+- [ ] Marcas de garra em parede
+- [ ] Overlay / tint vermelho da cidade de sangue
 
-## 5.1 Da jogadora e do mundo
+## 3.9 UI, HUD e menus
 
-- [x] **Passos** (`step01`, `step02`)
-- [x] Passos na grama (`Grass`)
-- [ ] **Abrir porta**
-- [ ] **Agachar / levantar**
-- [ ] **Arrastar e encostar escada**
-- [ ] **Remover barricada** (3 s, alto)
-- [ ] Som de dano na Chapéuzinho
-- [ ] **Som de morte**
-- [ ] **Ambiente geral** (vento, floresta, cidade vazia)
-- [x] Piscada do poste (`Pole_Blink`)
-- [ ] **Rádio com chiado** (casa sul)
+- [ ] Arte da tela de **menu principal**
+- [ ] Sprite do lobo do menu principal
+- [ ] **Botões** — normal, hover, pressionado, desabilitado
+- [ ] Fundo escuro da pausa
+- [ ] **Braço diegético** (`Arm.png`)
+- [ ] **Relógio do braço** — 8 quadros (23:00 → 06:00)
+- [ ] **Relógio do braço** — quadro de abertura 22:00 (`clock22.png`)
+- [ ] **Pulseira** — 3 quadros (3 → 1 coração)
+- [ ] **Latas de querosene amarradas** — 5 quadros (4 → 0 reservas)
+- [ ] Barra de querosene (4 traços de 15 s)
+- [ ] Ícones do menu
+- [ ] Faixa escura de fundo da legenda
+- [ ] Ícone / tecla do prompt do E
+- [ ] Tela de créditos
+- [ ] Tela preta com o relógio travado em 06:00
+- [ ] Ícone da janela / do executável
+- [ ] Splash / logo By The Sword
 
-## 5.2 Itens
+## 3.10 Setup técnico das texturas
 
-- [ ] 🟡 **Pegar item** genérico (`Item_Pick`) — cobre provisoriamente fatia, chave, moeda e bateria
-- [ ] **Pegar fatia** (som próprio — é a recompensa do jogo)
-- [ ] **Pegar chave**
-- [ ] **Pegar moeda**
-- [ ] **Pegar bateria**
-- [ ] **Trocar bateria**
-- [x] **Ligar / desligar lampião** (`Lantern ON-OFF`)
-- [ ] **Pegar marreta**
-- [ ] **Giro da marreta no vazio**
-- [ ] **Marretada acertando**
-- [ ] **Marreta quebrando**
-- [ ] **Chave caindo no chão**
-- [ ] **Gaiola destrancando**
-- [ ] **Queda da torta** (na máquina)
-- [ ] **Teclado da máquina**
-- [ ] **Erro da máquina (bipe alto)** — o que chama o Lobo
-
-## 5.3 Do Lobo
-
-- [x] **Uivo** (`uivo1`, `uivo2`)
-- [x] **Bote / ataque** (`ataque1`)
-- [ ] 🟡 **Lobo se aproximando** (`grunhido1`, `tensão1`) — falta a escada de respiração e passos por distância
-- [x] Impacto / hit (`hit1`)
-- [x] Lamento (`lamento1`)
-- [x] Transformação (`transformationWolf`)
-- [ ] **Lobo se afastando pela luz**
-- [ ] **Lobo atordoado** (respiração arrastada, 15 s)
-- [ ] Passos pesados do Lobo em camada própria, escalando por distância
-
-## 5.4 Vozes, narrativa e interface
-
-- [ ] **Falas dos moradores** (murmúrio — sem dublagem, por GDD)
-- [ ] **Caracteres da legenda** (tique de texto)
-- [ ] **Grito** do NPC da janela
-- [x] **Tiro** (`gun_shooting`) e carregar arma (`load_gun`)
-- [x] Hover de menu (`Mouse_Hover`)
-- [x] Press start (`Press_Start`)
-- [x] Pausa entrando e saindo (`Pause_IN`, `Pause_OUT`)
-- [ ] Clique de botão confirmado / negado
-- [ ] Som de recusa das trancas (`lockedClip` do `ItemRequirement`)
-
----
-
-# 6 · Música e trilha (GDD §11)
-
-- [ ] 🟡 **Trilha de fundo** — 1 faixa (`backgroundmusic1`); o `MusicDirector` aceita várias e sorteia sem repetir
-- [ ] 🟡 **Trilha de tensão** — 1 faixa (`tensão1`)
-- [ ] Faixas de fundo adicionais para a noite não ficar repetitiva (mínimo 3)
-- [ ] Faixas de tensão adicionais (mínimo 2)
-- [ ] Tema do **menu principal**
-- [ ] Tema / stinger da **cidade de sangue** (6ª fatia)
-- [ ] Stinger da **inversão da luz** (7ª fatia)
-- [ ] Tema da **cutscene final** e dos **créditos**
-- [ ] Stinger de morte / game over
-- [ ] Camada de ambiente contínua, separada da trilha
-- [ ] Todas as faixas em WAV 16-bit / 44.1 kHz e roteadas para os grupos do mixer
+- [ ] **Pixels Per Unit fixo** em todos os sprites do projeto
+- [ ] Filter Mode **Point (no filter)** em tudo
+- [ ] Compression **None** nos sprites de pixel art
+- [ ] Pivots padronizados (base do sprite, para o Y-sorting)
+- [ ] Sprites com material **`Sprite-Lit-Default`** para reagir à luz
+- [ ] Sprite sheets fatiadas no Sprite Editor com grid consistente
+- [ ] Sprite Atlas montado para reduzir draw calls
+- [ ] `Graphics > Transparency Sort Mode` = Custom Axis `(0,1,0)`
+- [ ] Sorting layers definidas (Chão, Cenário, Personagens, Frente, VFX, UI)
+- [ ] Nenhuma textura com bleeding no atlas
+- [ ] Paleta noturna aplicada consistentemente em todos os assets
+- [ ] Densidade de pixel art coerente com o mock de menu (referência do GDD §04)
 
 ---
 
-# 7 · Textos e falas (GDD §08)
+# 4 · Assets
 
-## 7.1 Os textos legíveis
+## 4.1 Cenas
 
-- [ ] **Carta da mãe** — ponto de spawn: objetivo + aviso de que o Lobo evolui a cada hora
-- [ ] **Bilhete do vizinho** — casa nordeste: o homem da cabana passa pela vila de madrugada há semanas
-- [ ] **Bilhete da professora** — casa oeste: por que a escola foi barricada por dentro
-- [ ] **Bilhete do aluno** — sala de aula: "o homem da cabana veio de novo perguntar quantos alunos tinham faltado"
-- [ ] **Lista de chamada** — secretaria: nomes riscados e a data da última aula, três dias atrás
-- [ ] **Última anotação** — sala dos professores: "trancamos por dentro porque não adianta trancar por fora. NÃO SOU EU."
+- [ ] `MainMenu.unity` — primeira tela com botões funcionais
+- [ ] `Game.unity` — a cidade inteira em cena única
+- [ ] Cena (ou setor) da **cutscene final**
+- [ ] Créditos (cena ou painel dentro do Game)
+- [ ] Build Settings com todas as cenas na ordem certa
+- [ ] Nenhuma cena de teste sobrando no build
+
+## 4.2 Prefabs — personagens
+
+- [ ] `Player.prefab` — Rigidbody2D, Collider2D, AudioSource, scripts na raiz, `Sprite` e `LanternLight` como filhos
+- [ ] `Wolf.prefab` — IA, `EnemyHabilities`, AudioSource e spawn point ligados
+- [ ] Prefab do morador (base, com paleta trocável)
+- [ ] Prefab do NPC da janela (só a janela acesa, nunca renderizado)
+- [ ] Prefab do ator da cutscene (Lobo-vovó / caçador no mesmo `SpriteRenderer`)
+
+## 4.3 Prefabs — itens (9 tipos · 20 unidades no mapa)
+
+- [ ] `SliceOfPie.prefab` — a fatia de torta (× 8)
+- [ ] Prefab do **lampião de querosene** (inicial, com a Chapéuzinho)
+- [ ] Prefab da **lata de querosene** (× 10)
+- [ ] Prefab da **escada** (× 1)
+- [ ] Prefab da **chave da cabana** (× 1)
+- [ ] Prefab da **marreta** (× 1)
+- [ ] Prefab da **chave da gaiola** (× 1, carregada pelo Lobo)
+- [ ] Prefab da **moeda** (× 1)
+- [ ] Prefab da **folha de estoque** (× 1)
+- [ ] Prefab das **chaves da escola** (× 3: secretaria, refeitório, armário)
+- [ ] Prefab de papel legível (base para os 7 textos)
+
+## 4.4 Prefabs — mundo
+
+- [ ] `poste1.prefab` — poste com `StreetLamp` e `Light2D` no filho
+- [ ] Prefab de porta de casa (com `Teleporter`)
+- [ ] Prefab de porta trancada (com `ItemRequirement`)
+- [ ] Prefab da barricada fixa
+- [ ] Prefab da barricada removível
+- [ ] Prefab da gaiola de ferro
+- [ ] Prefab da máquina com teclado
+- [ ] Prefab da sebe do labirinto
+- [ ] Prefab do poço
+- [ ] Prefab da árvore com ponto de encosto de escada
+- [ ] Prefab da casa (estado íntegro + destruído no mesmo objeto)
+- [ ] Prefab do rádio
+- [ ] Prefabs de decoração (armário, luminária, árvores, casas 1–3)
+
+## 4.5 Prefabs — UI
+
+- [ ] Canvas `HUD` — Scale With Screen Size, `160×144`, Match **Height**
+- [ ] Prefab do `Prompt` (Image + `InteractPrompt` + TextMeshProUGUI filho, bottom-center 150×16, Y 12)
+- [ ] Prefab do painel de **Pausa** (`Background` + `Buttons` com `CanvasGroup` + `UIFadeIn`)
+- [ ] Prefab do **ArmHUD** (`Arm`, `Clock`, `Bracelet`, `Battery` no mesmo rect)
+- [ ] Prefab da **legenda** (caixa de subtitle)
+- [ ] Prefab do fade preto (`CanvasGroup` full screen)
+- [ ] Prefab da tela de leitura de papel
+- [ ] **EventSystem** presente em toda cena com botão
+- [ ] Ordem de irmãos correta: `Prompt` acima de `Pause`, `Fade` e `MainMenu`
+
+## 4.6 Fontes e texto
+
+- [ ] `PixeloidSans` — TTF + SDF asset
+- [ ] `PixeloidSansBold` — TTF + SDF asset
+- [ ] `PixeloidMono` — TTF + SDF asset
+- [ ] Atlas SDF gerado com o `PixelFontSdfTool` (sem suavização)
+- [ ] Licença das fontes incluída no repositório
+- [ ] Material preset de texto legível sobre cenário escuro
+
+## 4.7 Textos do jogo (7 textos + falas)
+
+- [ ] **Carta da mãe** — objetivo + aviso das habilidades do Lobo
+- [ ] **Bilhete do vizinho** — o homem da cabana passa pela vila de madrugada
+- [ ] **Bilhete da professora** — por que a escola foi barricada por dentro
+- [ ] **Bilhete do aluno** — "o homem da cabana veio de novo perguntar quantos alunos faltaram"
+- [ ] **Lista de chamada** — nomes riscados + data da última aula
+- [ ] **Última anotação** — "trancamos por dentro… NÃO SOU EU."
 - [ ] **Papel da cabana** — "não sou eu" repetido até o fim da folha
-- [ ] **Folha de estoque** — loja: o código do produto da torta (único texto com função mecânica)
-- [ ] Consistência da **mesma letra** em três textos: bilhete da professora → última anotação → papel da cabana
-
-## 7.2 As falas únicas dos moradores (uma por casa)
-
-- [ ] **Noroeste** (3 moradores): "Fecha a porta. Ele já passou aqui uma vez hoje."
-- [ ] **Nordeste** (homem velho): "Não ouço mais nada desde as dez. Isso é bom ou é ruim?"
-- [ ] **Oeste** (professora e marido): "A escola está fechada. Barricamos por dentro. Não foi por causa de bicho."
-- [ ] **Sudeste** (pescador): "Leva. Eu não vou mais subir em nada."
-- [ ] **Sudoeste** (casal idoso): "A gente já contou as horas. Falta pouco."
-- [ ] **Sul** (rapaz do rádio): "Meu irmão saiu pra ver o que era o barulho. Já faz tempo."
-
-## 7.3 NPC da janela acesa
-
-- [ ] **Linha A** (3ª fatia): "Tem uma coisa tua caída lá no mato, do lado sul. Não vai com a luz acesa."
-- [ ] **Linha B** (6ª fatia, só se a fatia nº 8 ainda não foi pega): "Não bate mais nas outras portas. Não tem mais ninguém atrás delas."
-
-## 7.4 Textos de sistema
-
-- [x] Prompts de interação ("Pegar fatia", "Entrar", "Está trancado")
-- [ ] Recados de tranca de cada puzzle ("Não alcanço", "Falta a chave", "Precisa de moeda")
+- [ ] Os três textos da mesma mão com caligrafia coerente (professora → anotação → cabana)
+- [ ] Fala da casa noroeste — "Fecha a porta. Ele já passou aqui uma vez hoje."
+- [ ] Fala da casa nordeste — "Não ouço mais nada desde as dez. Isso é bom ou é ruim?"
+- [ ] Fala da casa oeste — "A escola está fechada. Barricamos por dentro. Não foi por causa de bicho."
+- [ ] Fala da casa sudeste — "Leva. Eu não vou mais subir em nada."
+- [ ] Fala da casa sudoeste — "A gente já contou as horas. Falta pouco."
+- [ ] Fala da casa sul — "Meu irmão saiu pra ver o que era o barulho. Já faz tempo."
+- [ ] **Linha A do NPC** (3ª fatia) — indica a fatia nº 8
+- [ ] **Linha B do NPC** (6ª fatia) — "Não bate mais nas outras portas."
+- [ ] Prompts contextuais do E (pegar, entrar, trancado, não alcanço, derrubar)
 - [ ] Textos de menu, opções e créditos
-- [ ] Versão em inglês de tudo acima
+- [ ] Tradução completa **PT-BR**
+- [ ] Tradução completa **Inglês**
+- [ ] Tabela de localização com todas as chaves
+
+## 4.8 Iluminação 2D
+
+- [ ] **Global Light 2D** calibrado por hora da noite (fora do círculo o mapa é quase preto)
+- [ ] `Light2D` do lampião — **Spot**, Inner/Outer Angle **360**, Outer Radius ~5
+- [ ] `Light2D` de cada poste (amarelo)
+- [ ] Preset vermelho dos postes (6ª fatia)
+- [ ] `Light2D` da janela acesa do NPC
+- [ ] `Light2D` da loja de conveniência (`alwaysOn`)
+- [ ] `Light2D` interno das casas íntegras
+- [ ] Luz da chama com flicker sutil
+- [ ] Blend Styles do URP 2D configurados e nomeados
+- [ ] Bloqueio de linha de visão das sebes do labirinto
+- [ ] Curva de escurecimento por fatia (22:00 → 06:00) validada em playtest
+
+## 4.9 Materiais e render
+
+- [ ] `Sprite-Lit-Default` aplicado a tudo que reage à luz
+- [ ] Material unlit para UI e HUD
+- [ ] `UniversalRenderPipelineGlobalSettings` conferido
+- [ ] **Pixel Perfect Camera** configurada (Assets PPU, Reference Resolution, Upscale RT)
+- [ ] Resolução interna escalada por inteiro, sem filtro
+- [ ] Post-processing mínimo (vinheta / grain) sem quebrar o pixel
+
+## 4.10 Distribuição dos itens no mapa (35 objetos)
+
+- [ ] Fatia **nº 1** — banco da entrada sul (spawn, sem puzzle)
+- [ ] Fatia **nº 2** — cruzamento central da rua (sem puzzle)
+- [ ] Fatia **nº 3** — centro do labirinto, ao lado do poço
+- [ ] Fatia **nº 4** — topo da árvore, floresta noroeste
+- [ ] Fatia **nº 5** — gaiola dentro da cabana
+- [ ] Fatia **nº 6** — armário da escola
+- [ ] Fatia **nº 7** — máquina da loja
+- [ ] Fatia **nº 8** — floresta sudoeste
+- [ ] Lata de querosene 1 — casa noroeste
+- [ ] Lata de querosene 2 — casa oeste
+- [ ] Lata de querosene 3 — casa sudoeste
+- [ ] Lata de querosene 4 — casa sul
+- [ ] Lata de querosene 5 — cabana do caçador
+- [ ] Lata de querosene 6 — loja de conveniência
+- [ ] Lata de querosene 7 — escola
+- [ ] Lata de querosene 8 — labirinto
+- [ ] Lata de querosene 9 — ao ar livre
+- [ ] Lata de querosene 10 — ao ar livre
+- [ ] Escada — dentro da casa sudeste
+- [ ] Chave da cabana — no mato atrás da casa do caçador
+- [ ] Marreta — encostada na parede da cabana
+- [ ] Chave da gaiola — no corpo do Lobo
+- [ ] Moeda — balcão da loja
+- [ ] Folha de estoque — atrás do balcão da loja
+- [ ] Chave da secretaria — sala de aula
+- [ ] Chave do refeitório — secretaria
+- [ ] Chave do armário — sala dos professores
+- [ ] Carta da mãe — ponto de spawn
+- [ ] Bilhete do vizinho — casa nordeste
+- [ ] Bilhete da professora — casa oeste
+- [ ] Bilhete do aluno — sala de aula
+- [ ] Lista de chamada — secretaria
+- [ ] Última anotação — sala dos professores
+- [ ] Papel da cabana — dentro da cabana
+- [ ] **Total conferido: 8 fatias + 20 unidades de item + 7 textos**
+
+## 4.11 Level design montado
+
+- [ ] Rua principal retilínea norte-sul em ladrilho
+- [ ] Trilhas de pedregulho ligando cada fachada
+- [ ] Grama fora da rua e das trilhas (sem calçada, sem fronteira vila/mata)
+- [ ] 6 casas entráveis posicionadas (NO, NE, O, SE, SO, S)
+- [ ] Casa do NPC na trilha leste
+- [ ] Praça do poço com o labirinto de sebes
+- [ ] Escola posicionada e trancada
+- [ ] Cabana do caçador — o ponto mais distante do mapa
+- [ ] Loja de conveniência
+- [ ] Casa da avó no fim da rua principal
+- [ ] Floresta noroeste (árvore da fatia nº 4)
+- [ ] Floresta sudoeste (fatia nº 8)
+- [ ] Colisores de todo o cenário
+- [ ] Rotas de patrulha do Lobo pela rua principal
+- [ ] Spawn point do Lobo (3ª fatia)
+- [ ] Pontos de espera do Lobo nas saídas dos interiores
+- [ ] Nenhum ponto do mapa em que a jogadora fique presa
+
+## 4.12 Configuração de projeto
+
+- [ ] Estrutura `Assets/_Project/{Art, Audio, Prefabs, Scenes, Scripts, UI}` respeitada
+- [ ] Layers e Tags definidas (Player, Enemy, Interactable, Shelter)
+- [ ] Layer própria para interagíveis (o buffer do `OverlapCircleNonAlloc` é 8)
+- [ ] Input map dos 8 botões: `W A S D · E · F · CTRL · ESC`
+- [ ] Physics 2D — matriz de colisão configurada
+- [ ] `.gitignore` do Unity conferido
+- [ ] Commits por sistema (padrão do GDD)
+- [ ] Build Windows x64 gerada e testada fora do editor
+- [ ] Ícone e nome da janela do executável
+- [ ] Sem sistema de save (fora de escopo — confirmar que nada persiste)
+- [ ] GDD versionado junto do repositório
 
 ---
 
-# 8 · Técnico, build e otimização (GDD §11)
+# 5 · Scripts
 
-## 8.1 Setup de projeto
+> `Assets/_Project/Scripts/` · `Noise` é classe estática e `IInteractable` é interface — nenhum dos dois vai em GameObject.
 
-- [x] Unity **2022.3.62f3 (LTS)** com pipeline **2D URP**
-- [x] Estrutura `Assets/_Project/{Art, Audio, Prefabs, Scenes, Scripts, UI}`
-- [x] Versionamento Git com commits por sistema
-- [x] `Sprite-Lit-Default` nos sprites que reagem à luz
-- [x] `Transparency Sort Mode` = Custom Axis `(0,1,0)` — Y-sorting
-- [x] Canvas Scaler em `160 × 144`, Match Height
-- [ ] **Pixel Perfect Camera** configurada
-- [ ] **Pixels per unit fixo** em todo o projeto (auditar imports)
-- [ ] Resolução interna escalada por inteiro, *nearest neighbor*, sem filtro nem suavização (auditar `Filter Mode` e compressão de todos os sprites)
-- [ ] **AudioMixer** com os grupos ambiente / Lobo / UI
-- [ ] Layer própria para interagíveis (o `interactableLayers` está em *Everything* e o buffer do `OverlapCircle` é 8)
-- [ ] Limpeza de branches e merge na `main` (há 7 branches locais e 11 remotas abertas)
+## 5.1 Player
 
-## 8.2 Balanceamento (GDD §05, §11)
+- [ ] `Player/PlayerController.cs` — movimento WASD, velocidade única, sem stamina
+- [ ] `PlayerController` — `SetCrouched` / `IsCrouched` (CTRL)
+- [ ] `PlayerController` — multiplicador de velocidade agachada (0.5)
+- [ ] `PlayerController` — custo de tempo da animação ao levantar
+- [ ] `PlayerController` — `MovementLocked` para cutscene e menu
+- [ ] `Player/PlayerHealth.cs` — 3 corações, dano variável (1 → 2 na 5ª fatia), sem cura
+- [ ] `PlayerHealth` — invulnerabilidade curta, knockback e `OnHeartsChanged`
+- [ ] `Player/PlayerHitFlash.cs` — flash do sprite ao levar dano
+- [ ] `Player/PlayerInteractor.cs` — raio do E e `OnFocusChanged(alvo, texto)`
+- [ ] `PlayerInteractor` — regra do GDD: **agachada não interage com itens**
+- [ ] `Player/PlayerInventory.cs` — roteia por `itemId`, conta fatias 0–8, `OnAllSlicesCollected`
+- [ ] `PlayerInventory` — `Consume` recusa o `sliceItemId` de propósito
+- [ ] `Player/PlayerFootsteps.cs` — `stepClips` sorteados, `stepInterval`, `crouchVolume`
+- [ ] `PlayerFootsteps` — som por **superfície** (grama, ladrilho, pedregulho, piso interno)
+- [ ] `Player/PlayerAnimatorBridge.cs` — escreve `MoveX`, `MoveY`, `IsMoving`, `IsCrouched`
+- [ ] `Player/Lantern.cs` — F acende e apaga; apagado não queima
+- [ ] `Lantern` — lata = 60 s (4 traços × 15 s), troca automática, `OnSpareBatteriesChanged`
+- [ ] `Lantern` — `Illuminates(ponto)` para a IA decidir o RECUO
+- [ ] `Lantern` — renomear bateria → **querosene** (GDD v1.6: nada de elétrico no jogo)
+- [ ] **Novo:** `Player/LanternSway.cs` — física do balanço do lampião e do círculo de luz
+- [ ] **Novo:** `Player/HandSlot.cs` — slot único de mãos: lampião / escada / marreta nunca coexistem
+- [ ] **Novo:** `Player/Hammer.cs` — F gira, trava o movimento, quebra ao acertar, 1 acerto por partida
+- [ ] **Novo:** `Player/Ladder.cs` — carregar, encostar na árvore e subir
+- [ ] **Novo:** `Player/BloodTrail.cs` — o rastro que o Lobo fareja a partir da 4ª fatia
 
-- [ ] **10 baterias × 60 s** conferidas em partida de 15–30 min (se a noite ficar clara demais, cortar para 30 s por bateria **antes** de mexer na quantidade)
-- [ ] Largura dos corredores do labirinto contra o raio do lampião
-- [ ] Velocidades, raios de percepção e de visão do Lobo por estágio
-- [ ] Janela do giro da marreta (dificuldade do acerto no escuro)
-- [ ] Tempo de invulnerabilidade e knockback
-- [ ] Ritmo do relógio × tempo real de travessia do mapa
+## 5.2 Inimigo — o Lobo
 
-## 8.3 Qualidade e entrega
+- [ ] `Enemy/EnemyMov.cs` — estado **PATRULHA** por pontos do mapa
+- [ ] `EnemyMov` — estado **SUSPEITA** alimentado por `Noise.OnNoise`
+- [ ] `EnemyMov` — estado **PERSEGUIÇÃO** por linha de visão
+- [ ] `EnemyMov` — estado **RECUO** dentro do círculo do lampião aceso
+- [ ] `EnemyMov` — agachada, ele não a percebe (nem por proximidade nem por visão)
+- [ ] `EnemyMov` — pathfinding que não trave em sebe, parede ou mobília
+- [ ] `Enemy/EnemyAtk.cs` — alcance, cooldown, recuo pós-ataque e `Damage` variável
+- [ ] **Novo:** estado **BOTE** — janela de ataque telegrafada antes da mordida
+- [ ] **Novo:** estado **ATORDOADO** — 15 s, uma vez por partida, disparado pela marretada
+- [ ] **Novo:** `Enemy/EnemyScent.cs` — rastreamento por trilha de sangue (4ª fatia)
+- [ ] **Novo:** `Enemy/EnemyShelterRule.cs` — não invade interiores íntegros, **espera na saída**
+- [ ] **Novo:** o Lobo entra nos interiores **arruinados** depois da 6ª fatia
+- [ ] **Novo:** suspeita disparada por porta aberta, barricada removida e erro no teclado
+- [ ] `Enemy/EnemyHabilities.cs` — tabela `WolfStage` 0–8, idempotente, `ApplyStage(0)` reinicia
+- [ ] `EnemyHabilities` — reescreve presença, `SenseRadius`, `SightRadius`, `ChaseSpeed`, `Damage`, `FearsLight`
+- [ ] `EnemyHabilities` — `cue` (som da hora) e `onReached` (`UnityEvent` de ambientação) por estágio
+- [ ] `EnemyHabilities` — estágio 1 (23:00) uivo distante
+- [ ] `EnemyHabilities` — estágio 2 (00:00) postes piscam
+- [ ] `EnemyHabilities` — estágio 3 (01:00) blecaute + Lobo entra + linha A do NPC
+- [ ] `EnemyHabilities` — estágio 4 (02:00) faro do sangue
+- [ ] `EnemyHabilities` — estágio 5 (03:00) garras, dano 2
+- [ ] `EnemyHabilities` — estágio 6 (04:00) cidade de sangue
+- [ ] `EnemyHabilities` — estágio 7 (05:00) **a luz vira isca** (emite ruído na posição da luz)
+- [ ] `EnemyHabilities` — estágio 8 (06:00) o Lobo some do mapa sem ser destruído
+- [ ] `Enemy/EnemyAudio.cs` — passos e respiração escalando por distância
+- [ ] `EnemyAudio` — `grassClips` só com o Lobo perto e **fora do quadro**
+- [ ] `Enemy/EnemyAnimatorBridge.cs` — estados da IA → parâmetros do Animator
+- [ ] **Novo:** `Enemy/WolfKeyDrop.cs` — a chave da gaiola cai no ponto exato do golpe
 
-- [ ] Playtest completo de uma partida inteira (22:00 → 06:00)
-- [ ] Playtest de ordens alternativas de coleta (checando deadlock)
-- [ ] Passagem de performance (luzes 2D, colliders, tilemaps)
-- [ ] Build **Windows** rodando fora do editor
-- [ ] Ícone e nome do executável
-- [ ] Instruções de instalação e controles para a página do jogo
-- [ ] Vídeo / GIF de divulgação e capturas de tela
+## 5.3 Interação
 
----
+- [ ] `Interaction/IInteractable.cs` — `Prompt`, `CanInteract`, `Interact`
+- [ ] `Interaction/Collectible.cs` — `itemId`, `displayName`, `amount`, `promptOverride`
+- [ ] `Collectible` — seção **Tranca** (`ItemRequirement`) e `SetLocked(bool)`
+- [ ] `Interaction/ItemRequirement.cs` — `itemId`, `amount`, `consume`, `lockedPrompt`, `lockedMessage`, `lockedClip`, `onLockedAttempt`
+- [ ] `ItemRequirement.OnAnyDenied` — evento estático que o `InteractPrompt` já escuta
+- [ ] `ItemRequirement` — trancado **continua** respondendo ao E (regra que não deve ser "consertada")
+- [ ] `Interaction/KnockDown.cs` — derrubar a fatia da copa antes de coletar
+- [ ] `Interaction/Teleporter.cs` — `destination`, `snapCamera`, `stopOnArrival`, `singleUse`, `onTeleported`
+- [ ] `Teleporter.OnAnyTeleport` — aviso por código
+- [ ] **Novo:** `Interaction/Readable.cs` — os 7 textos, leitura em tela cheia com E
+- [ ] **Novo:** `Interaction/Door.cs` — porta com estado, som e suspeita do Lobo ao abrir
+- [ ] **Novo:** `Interaction/Barricade.cs` — remoção com E em 3 s, barulho alto, emite `Noise`
+- [ ] **Novo:** `Interaction/Cage.cs` — a gaiola de ferro da fatia nº 5
+- [ ] **Novo:** `Interaction/VendingMachine.cs` — moeda + código; o bipe do erro emite ruído
+- [ ] **Novo:** `Interaction/Keypad.cs` — entrada do código pelo teclado da máquina
 
-# 9 · Divergências entre o GDD v1.5 e o projeto (decidir antes de fechar)
+## 5.4 Sistemas
 
-| # | GDD v1.5 diz | O projeto tem hoje | Ação |
-|---|---|---|---|
-| 1 | Fatia nº 4 é resolvida com a **escada** da casa sudeste, carregada no lugar do lampião | Um item **`galho`** com `KnockDown` derruba a fatia da árvore | Escolher: implementar a escada ou atualizar o GDD |
-| 2 | Fatia nº 7 exige **moeda + código** digitado no teclado da máquina | Moeda e máquina existem; sem teclado, sem código e sem bipe de erro | Implementar o teclado e ligar a folha de estoque |
-| 3 | HUD do §04 com relógio, corações e bateria **nos cantos da tela** | HUD **diegética no braço**, que sobe com a pausa | Substituição consciente — registrar no GDD |
-| 4 | **10 baterias** no mapa | `ArmHUD` desenha **4 slots** de reserva | Ajustar a folha da bateria ou a leitura do HUD |
-| 5 | Rastreamento por **trilha de sangue** na 4ª fatia | Representado só por `senseRadius` aberto | Implementar a trilha ou assumir a simplificação |
-| 6 | Marreta pode ser pega a qualquer momento | Sem guarda nenhuma | Bloquear a coleta enquanto o Lobo não estiver no mapa (o próprio GDD recomenda) |
+- [ ] `Systems/Clock.cs` — começa em 22:00 e avança 1 h por fatia até 06:00
+- [ ] `Clock` — `OnHourChanged(hora, texto)`, `TimeText`, `HoursElapsed` (0–8)
+- [ ] `Systems/NightRunner.cs` — morte, `deathDelay`, fade e recarga da cena
+- [ ] `NightRunner` — congela o Lobo no instante da morte
+- [ ] `NightRunner` — `onNightSurvived` na oitava fatia (porta da avó abre, Lobo sai)
+- [ ] `Systems/EndingSequence.cs` — cutscene final beat a beat, input travado
+- [ ] `EndingSequence` — troca Lobo-vovó → caçador no mesmo `SpriteRenderer`
+- [ ] `EndingSequence` — som da arma, tiro, corte para preto e créditos
+- [ ] `Systems/PauseMenu.cs` — ESC, `pausePanel`, `Resume/OpenOptions/GoToMainMenu/QuitGame`
+- [ ] **Novo:** `Systems/BloodCityEvent.cs` — o evento da 6ª fatia inteiro
+- [ ] **Novo:** `Systems/HouseState.cs` — íntegro ↔ destruído, troca instantânea fora da tela
+- [ ] `HouseState` — os objetos (latas, escada) permanecem no meio dos escombros
+- [ ] **Novo:** `Systems/SchoolLock.cs` — a escola só destranca com a cidade de sangue
+- [ ] **Novo:** `Systems/GrannyDoor.cs` — a casa da avó destranca em 8/8 (transição irreversível)
+- [ ] **Novo:** `Systems/HammerGuard.cs` — bloqueia a marreta enquanto o Lobo não está no mapa
+- [ ] **Novo:** `Systems/NightLighting.cs` — Global Light 2D por hora da noite
+- [ ] **Novo:** validação de que **nenhuma ordem de coleta gera deadlock** (GDD §09)
 
----
+## 5.5 Mundo
 
-# 10 · Fora de escopo (GDD §11 — não implementar)
+- [ ] `World/StreetLamp.cs` — aceso (0–1), piscada (2), apagado (3+)
+- [ ] `StreetLamp` — `flickerAtSlice`, `blackoutAtSlice`, `flickerJitter`, `alwaysOn`
+- [ ] `StreetLamp` — `StartFlicker()` para testar sem coletar duas fatias
+- [ ] `StreetLamp` — **reacender em vermelho** na 6ª fatia (GDD v1.6)
+- [ ] **Novo:** `World/Villager.cs` — fala única do morador mais próximo da porta
+- [ ] `Villager` — os demais moradores são ambientação e não reagem a nada
+- [ ] **Novo:** `World/WindowNPC.cs` — linha A (3ª fatia), linha B (6ª fatia), grito e queda da casa
+- [ ] `WindowNPC` — a casa só cai **depois** da fatia nº 8, antes ou depois da cidade de sangue
+- [ ] **Novo:** `World/Radio.cs` — o rádio com chiado da casa sul
+- [ ] **Novo:** `World/Hedge.cs` — bloqueio de linha de visão do labirinto
+- [ ] **Novo:** `World/SurfaceTag.cs` — marca a superfície para o som de passo certo
 
-- Múltiplos finais
-- Sistema de save
-- Combate (o único revide do jogo é a marretada, que só atordoa)
-- Inventário além dos slots fixos
-- Dublagem
+## 5.6 Áudio
 
----
+- [ ] `Audio/Noise.cs` — `Noise.Emit(pos, raio, source)` e `Noise.OnNoise` (classe estática)
+- [ ] `Audio/MusicDirector.cs` — faixas de fundo e de tensão, nunca simultâneas
+- [ ] `MusicDirector` — crossfade por duas `AudioSource`, silêncio real entre faixas
+- [ ] `MusicDirector` — `backgroundTracks`, `tensionTracks` e volumes separados
+- [ ] **Novo:** `Audio/AmbienceZone.cs` — troca de ambiência por área (casa, floresta, escola, loja)
+- [ ] **Novo:** `Audio/AudioMixerBridge.cs` — volume por camada no menu de opções
 
-# 11 · Cronograma (GDD §11)
+## 5.7 UI
 
-| Fase | Dias | Entrega |
-|---|---|---|
-| Escrever história | 1 | Roteiro fechado, cutscene beat a beat, falas e bilhetes |
-| Montar GDD | 1 | Escopo travado antes de qualquer linha de código |
-| Prototipagem, som e assets | 7 | Movimentação, agachar, lampião, IA do Lobo, sprites, animações e trilha |
-| Criação do game | 5 | Cidade, interiores, escola, labirinto, 8 fatias, 6 puzzles, marreta, menu, cutscene, progressão |
-| Otimização | 3 | Balanceamento, ajuste de áudio, build e polimento |
-| **Total** | **17** | Pré-produção 2 · Produção 12 · Polimento 3 |
+- [ ] `UI/ArmHUD.cs` — braço diegético que sobe junto com a pausa
+- [ ] `ArmHUD` — relógio (8 sprites, 23:00→06:00) + `nightStartSprite` (22:00)
+- [ ] `ArmHUD` — pulseira (3 sprites) por `PlayerHealth.OnHeartsChanged`
+- [ ] `ArmHUD` — latas de reserva (5 sprites) por `Lantern.OnSpareBatteriesChanged`
+- [ ] `ArmHUD` — redesenho por evento, nunca por frame
+- [ ] `UI/InteractPrompt.cs` — prompt do E; esconde o **texto**, não o objeto
+- [ ] `InteractPrompt` — `background` opcional e `Flash("texto")`
+- [ ] `InteractPrompt` — escuta `ItemRequirement.OnAnyDenied` sozinho
+- [ ] `UI/UIFadeIn.cs` — fade em tempo real (imune ao `timeScale = 0`), bloqueia clique durante o fade
+- [ ] `UI/UISounds.cs` — hover e clique automáticos nos `Button` filhos; `PlayStart()` manual
+- [ ] **Novo:** `UI/Subtitles.cs` — legendas com som por caractere (falas, NPC, cutscene)
+- [ ] **Novo:** `UI/Localization.cs` — troca PT-BR / Inglês
+- [ ] **Novo:** `UI/MainMenu.cs` — botões da primeira tela (hoje é só arte)
+- [ ] **Novo:** `UI/OptionsMenu.cs` — volume por camada e idioma
+- [ ] **Novo:** `UI/KerosineBar.cs` — a barra de querosene (4 traços × 15 s)
+- [ ] **Novo:** `UI/CreditsRoll.cs` — créditos após o tiro
 
-**Ordem recomendada pelo GDD:** prototipar primeiro o par **lampião + IA do Lobo** numa cena vazia — se essa relação não gerar tensão sozinha, nenhum puzzle ou sprite salva o jogo. Depois, a **troca de estado das casas**: o efeito mais barato de implementar e o que mais muda a partida inteira.
+## 5.8 Câmera e Editor
 
-> ⚠️ **Alerta de escopo do GDD:** sair do 8-bit para a densidade do mock de menu multiplica o custo de arte de todo o projeto. Se algo tiver que ceder, ceda primeiro no **número de interiores únicos**, não no padrão visual. O primeiro candidato a encolher é a **escola** — cortando a sala dos professores e movendo a chave do armário para o refeitório.
+- [ ] `Camera/CameraFollow.cs` — amortecimento e snap para o `Teleporter`
+- [ ] `Editor/PixelFontSdfTool.cs` — geração dos atlas SDF sem suavização
+- [ ] **Novo:** `Editor/SliceMapValidator.cs` — confere as 8 fatias, 10 latas e 7 textos na cena
+- [ ] **Novo:** `Editor/StageTableInspector.cs` — visualiza a tabela de 8 estágios do Lobo
+
+## 5.9 Balanceamento e documentação
+
+- [ ] `moveSpeed` 3.5 · `crouchSpeedMultiplier` 0.5 · `stepNoiseRadius` 6
+- [ ] `invulnerabilityDuration` 1 s · `Outer Radius` da luz ~5
+- [ ] 10 latas × 60 s = até 10 min de chama em uma partida de 15–30 min
+- [ ] Plano B do querosene: cortar para **30 s por lata** antes de mexer na quantidade
+- [ ] Enquanto ela está dentro de uma casa, o Lobo continua se movendo
+- [ ] `Scripts/README.md` atualizado com todo script novo
+- [ ] Todo script novo com `<summary>` explicando o porquê, no padrão dos existentes
+- [ ] Nenhum `Debug.Log` sobrando na build final
+- [ ] Nenhum `-=` faltando em `OnDisable` (assinaturas de evento estático)
